@@ -1411,21 +1411,26 @@ function renderBackgroundShop() {
   container.innerHTML = BACKGROUND_CATALOG.map((bg) => {
     const isOwned = gameState.unlockedBackgrounds.includes(bg.id);
     const isEquipped = getCurrentTank().background === bg.id;
+    const canAfford = gameState.money >= bg.cost;
+
+    let buttonHtml = '';
+    if (isOwned) {
+      buttonHtml = `<button class="secondary-button" style="width: 100%;" ${isEquipped ? 'disabled' : ''} onclick="buyBackground('${bg.id}', 0)">${isEquipped ? 'Equipped' : 'Equip'}</button>`;
+    } else {
+      buttonHtml = `<button class="primary-button shop-button" style="width: 100%;" ${!canAfford ? 'disabled' : ''} onclick="buyBackground('${bg.id}', ${bg.cost})">${canAfford ? 'Purchase Basin' : `Need $${bg.cost}`}</button>`;
+    }
 
     return `
       <div class="shop-card">
         <h3>${bg.name}</h3>
         <p class="small-text">${bg.desc}</p>
         <div class="shop-price">${bg.cost > 0 ? '$' + bg.cost : 'Default'}</div>
-        <button class="primary-button shop-button" 
-          ${isOwned ? 'disabled' : ''} 
-          onclick="buyBackground('${bg.id}', ${bg.cost})">
-          ${isOwned ? (isEquipped ? 'Equipped' : 'Owned') : 'Purchase Basin'}
-        </button>
+        ${buttonHtml}
       </div>
     `;
   }).join('');
 }
+
 
 window.buyBackground = function (bgId, cost) {
   if (gameState.money < cost) return;
@@ -1637,7 +1642,16 @@ function openMoveModal(fishArray, titleText) {
   const otherTanks = unlocked.filter((id) => id !== gameState.currentTankId);
 
   if (otherTanks.length === 0) {
-    alert('You only have 1 basin! Purchase another basin in the Shop to transfer fish.');
+    if (subtitle) subtitle.textContent = titleText || 'Transfer fish';
+    container.innerHTML = `
+      <div style="text-align: center; padding: 20px 10px;">
+        <p class="small-text" style="font-size: 14px; margin-bottom: 16px; color: var(--danger); font-weight: bold;">
+          You only have 1 basin! Purchase another basin in the Shop to transfer fish.
+        </p>
+        <button class="primary-button" style="padding: 8px 20px;" onclick="document.getElementById('moveModal').classList.add('hidden'); window.pendingMoveFishList = [];">Close</button>
+      </div>
+    `;
+    modal.classList.remove('hidden');
     return;
   }
 
@@ -1675,6 +1689,7 @@ function openMoveModal(fishArray, titleText) {
 
   modal.classList.remove('hidden');
 }
+
 
 // Executes transfer when clicking "Transfer Here" in the pop-up
 window.confirmTransferFish = function (targetTankId) {

@@ -51,7 +51,7 @@
 
             <h3 style="margin: 4px 0; color: var(--primary);">4. Interactive Feeding & Metabolism</h3>
             <p style="margin: 0;">
-              Toggle <strong>Feed Mode</strong> in the bottom bar and hold your mouse over the water to drop nutritional pellets. Hungry fish will swim upward to consume them, earning you cash. Each fish has a genetically tied <strong>Max Food Capacity</strong> and <strong>Digestion Cooldown</strong> governing their feeding appetite.
+              Toggle <strong>Feed Mode</strong> in the bottom bar and hold your mouse over the water to drop nutritional pellets. Hungry fish will swim upward to consume them, earning you cash. Each fish has a genetically tied <strong>Max Food Capacity</strong> and they need to be fed to breed.
             </p>
 
             <h3 style="margin: 4px 0; color: var(--primary);">5. Official References & Further Reading</h3>
@@ -60,10 +60,10 @@
             </p>
             <div style="display: flex; flex-direction: column; gap: 4px; background: rgba(59,157,184,0.08); padding: 10px; border-radius: 8px;">
               <a href="https://medakazukan.net/charactaristics/" target="_blank" style="color: var(--primary); font-weight: bold; text-decoration: none;">
-                🔗 Medaka Zukan – Official 44 Characteristics Guide
+                Medaka Zukan - Official 44 Characteristics Guide
               </a>
               <a href="https://www.medakanoyakata.jp/?tid=6&mode=f168" target="_blank" style="color: var(--primary); font-weight: bold; text-decoration: none;">
-                🔗 Medaka no Yakata – Breeding & Variety Encyclopedia
+                Medaka no Yakata - Breeding & Variety Encyclopedia
               </a>
             </div>
           </div>
