@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedaGaku</title>
+  <link rel="icon" type="image/png" href="images/icon.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <!-- TOP STATUS & CONTROLS BAR -->
+  <header class="topbar">
+    <div class="logo">
+      <img src="images/logo.png" alt="MedaGaku" style="max-width: 100%; height: auto"
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';" />
+      <span style="display: none; font-size: 24px; font-weight: bold; color: var(--primary);">
+        MedaGaku
+      </span>
+    </div>
+
+    <!-- CENTER SAVE / QUICK CONTROLS -->
+    <div class="header-save-controls">
+      <button id="headerSaveBtn" class="primary-button" title="Save Game">
+        <img src="emoji/save.png" alt="Save" class="ui-emoji" /> Save
+      </button>
+      <button id="headerSaveExitBtn" class="secondary-button" title="Save & Exit to Title">
+        <img src="emoji/exit.png" alt="Exit" class="ui-emoji" /> Save & Exit
+      </button>
+    </div>
+
+    <div class="stats">
+      <!-- Help / Guide Trigger -->
+      <button id="helpBtn" class="stat"
+        style="cursor: pointer; font-family: inherit; font-size: 14px; transition: background 0.2s;"
+        title="Breeding, Diet & Trait Manual">
+        <img src="emoji/info.png" alt="Help" class="ui-emoji" /> Guide
+      </button>
+
+      <div class="stat">
+        <img src="emoji/money.png" alt="Money" class="ui-emoji" />
+        <span id="money">$100</span>
+      </div>
+      <div class="stat">
+        <img src="emoji/shrimp.png" alt="Population" class="ui-emoji" />
+        <span id="population">0 / 50</span>
+      </div>
+      <div class="stat">
+        <img src="emoji/calendar.png" alt="Day" class="ui-emoji" /> Day
+        <span id="day">1</span>
+      </div>
+      <div class="stat">
+        <img src="emoji/clock.png" alt="Clock" class="ui-emoji" />
+        <span id="clock">00:00:00</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="game-layout">
+    <!-- ================= LEFT COLUMN ================= -->
+    <section class="left-column">
+      <div class="left-column-grid">
+        <!-- FLOATING / TOGGLEABLE MEDAKA LIST -->
+        <div id="movableMedakaList" class="panel shrimp-list-column hidden">
+          <div class="movable-header">
+            <span>
+              <img src="emoji/list.png" alt="List" class="ui-emoji" /> Basin Fish List
+            </span>
+            <button id="sortMedakaListBtn" class="secondary-button"
+              style="padding: 2px 8px; font-size: 11px; margin-left: auto;">
+              Sort: Value
+            </button>
+          </div>
+          <div style="padding: 6px 8px; border-bottom: 1px solid var(--border); background: var(--panel);">
+            <input type="text" id="pondListSearchInput" class="multi-select-search"
+              placeholder="Search fish (color, fin, appetite, eyes)..." autocomplete="off" style="width: 100%;" />
+          </div>
+          <div class="movable-body" id="medakaListBody">
+            <!-- Rendered programmatically -->
+          </div>
+        </div>
+
+        <!-- MAIN AQUARIUM / BASIN VIEWPORT -->
+        <div class="panel aquarium-panel" style="flex-grow: 1;">
+          <div class="panel-title" style="
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 10px;
+                margin-bottom: 14px;
+                padding-bottom: 4px;
+                flex-wrap: wrap;
+              ">
+            <!-- Left: Basin Title & Switcher -->
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <img src="emoji/herb.png" alt="Basin" class="ui-emoji"
+                style="width: 24px !important; height: 24px !important;" />
+              <span id="singleTankTitle"
+                style="font-size: 22px; font-weight: bold; color: var(--text); letter-spacing: -0.2px;">
+                Breeding Basin
+              </span>
+              <select id="tankSelectDropdown" class="secondary-button hidden" style="
+                    font-size: 15px;
+                    font-weight: bold;
+                    padding: 5px 12px;
+                    cursor: pointer;
+                    border-radius: 9px;
+                    border: 1.5px solid var(--border);
+                  ">
+                <option value="tank1">Main Basin</option>
+                <option value="tank2">Selected Broodstock Tank</option>
+              </select>
+            </div>
+
+            <!-- EQUIPPED BASIN BACKGROUND SELECTOR (Unlocks via Shop) -->
+            <div class="target-group-box">
+              <span class="target-group-title">
+                <img src="emoji/theme.png" alt="BG" class="ui-emoji" /> Equipped Background
+              </span>
+              <div class="target-group-buttons">
+                <select id="bgSelectDropdown" class="secondary-button"
+                  style="font-size: 12px; font-weight: bold; padding: 5px 8px; border-radius: 7px; border: 1.5px solid var(--border); cursor: pointer;">
+                  <option value="blue">Clear Blue Basin</option>
+                  <!-- Additional backgrounds unlocked upon shop purchase -->
+                </select>
+              </div>
+            </div>
+
+            <!-- CULLING TARGETS GROUP -->
+            <div id="cullingTargetsGroup" class="target-group-box">
+              <span class="target-group-title">
+                <img src="emoji/target.png" alt="Target" class="ui-emoji" /> Culling Targets
+              </span>
+              <div class="target-group-buttons">
+                <button id="openCullingTargetsModalBtn" class="secondary-button multi-select-btn" style="padding: 6px 12px; font-size: 12.5px;">
+                  <img src="emoji/dna.png" alt="DNA" class="ui-emoji" />
+                  <span id="trackedAllelesBtnLabel">Configure Targets (0)</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- POPULATION COUNTER & LIST TOGGLE -->
+            <div style="display: flex; align-items: center; gap: 8px; margin-left: auto;">
+              <button id="medakaListBtn" class="secondary-button" style="padding: 7px 12px; font-size: 13px;">
+                <img src="emoji/list.png" alt="List" class="ui-emoji" /> Fish List
+              </button>
+              <div class="tank-status" id="tankStatus">0 / 50</div>
+            </div>
+          </div>
+
+          <!-- WATER VIEWPORT CANVAS -->
+          <div id="aquarium" class="aquarium bg-blue">
+            <div class="water-surface"></div>
+            <div class="bubble bubble1"></div>
+            <div class="bubble bubble2"></div>
+            <div class="bubble bubble3"></div>
+            <div class="bubble bubble4"></div>
+
+            <!-- Aquatic Vegetation Layers -->
+            <img id="aquariumPlantLeft" src="plants/planbg1.png" class="plant plant-left" alt="Hornwort" />
+            <img id="aquariumPlantRight" src="plants/planbg2.png" class="plant plant-right" alt="Water Sprite" />
+
+            <!-- Floating Breeding Mops & Spawning Plants -->
+            <div id="aquariumFloater" class="plant-floater"></div>
+            <img id="aquariumSpawningMop" class="plant-upgrade hidden" src="plants/spawningMop.png" alt="Spawning Mop"
+              onerror="this.style.display='none'" />
+
+            <!-- FALLING FOOD PELLETS LAYER (Interactive Mouse Feeding) -->
+            <div id="foodLayer" class="food-layer"></div>
+
+            <!-- Active Fish Sprites Container (144x144 composite sprites) -->
+            <div id="medakaLayer"></div>
+            <!-- SPREAD EGG CLUSTER (Appears when nursery has > 1 clutch) -->
+            <div id="aquariumBottomEggs" class="bottom-egg-cluster hidden"
+              title="Eggs ready to harvest! Click to open nursery."></div>
+            <div class="sand"></div>
+          </div>
+
+          <div class="aquarium-footer">
+            <div class="aquarium-help" id="aquariumHelpText">
+              Click any medaka in the basin to inspect its genetics, or toggle Feed Mode to nourish your school.
+            </div>
+
+            <div class="aquarium-sell-controls">
+              <!-- FEEDING MODE BUTTON -->
+              <button id="feedModeBtn" class="primary-button" style="background-color: #e67e22;"
+                title="Toggle food sprinkling mode">
+                <img src="emoji/food.png" alt="Feed" class="ui-emoji" />
+                Feed Mode: OFF
+              </button>
+
+              <!-- NURSERY HARVEST -->
+              <button id="harvestEggsBtn" class="primary-button hidden" style="background-color: var(--success);">
+                <img src="emoji/baby.png" alt="Eggs" class="ui-emoji" />
+                Egg Nursery Harvest (0)
+              </button>
+
+              <button id="sellModeButton" class="secondary-button">
+                <img src="emoji/shrimp.png" alt="Select" class="ui-emoji" />
+                Select Mode: OFF
+              </button>
+              <button id="moveSelectedButton" class="primary-button hidden" disabled>
+                <img src="emoji/herb.png" alt="Move" class="ui-emoji" /> Move Selected (0)
+              </button>
+              <button id="sellSelectedButton" class="danger-button hidden" disabled>
+                <img src="emoji/dollar.png" alt="Sell" class="ui-emoji" /> Sell Selected (0)
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SIMULATION SPEED CONTROLS & ACTIVE DIET BADGE -->
+      <div class="panel controls-panel">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 10px;">
+          <!-- Left: Title -->
+          <h2 style="margin: 0; align-self: center;">Time & Diet Controls</h2>
+          
+          <!-- Right: Food Dropdown on top, Auto-Feeder directly below it -->
+          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
+            <!-- Food Dropdown Container -->
+            <div id="foodBadgeContainer" class="stat" style="font-size: 12px; padding: 4px 10px; display: flex; align-items: center; gap: 6px; margin: 0;">
+              <img src="emoji/food.png" alt="Food" class="ui-emoji" />
+              <span id="equippedFoodName">Standard Flake</span>
+              <strong id="equippedFoodValue" style="color: var(--success); margin-left: 4px;">(+$1/bite)</strong>
+            </div>
+
+            <!-- Automatic Feeder Button directly below Food Dropdown -->
+            <button id="openAutoFeederBtn" class="secondary-button" style="font-size: 11.5px; padding: 4px 10px; font-weight: bold; display: flex; align-items: center; gap: 5px; cursor: pointer;">
+              <img src="emoji/food.png" alt="Auto" class="ui-emoji" style="width: 14px !important; height: 14px !important; margin: 0;" />
+              <span id="autoFeederBtnLabel">Auto-Feeding (Locked)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Speed Buttons Row (Restored to its original clean position) -->
+        <div class="control-row">
+          <button id="speed1" class="speed-button active">1x</button>
+          <button id="speed2" class="speed-button">2x</button>
+          <button id="speed5" class="speed-button">5x</button>
+          <button id="speed20" class="speed-button">20x</button>
+          <button id="speed60" class="speed-button">60x</button>
+        </div>
+
+        <div class="small-text">
+          Standard speed runs breeding checks every minute. Satiated fish will slowly digest their meals based on their
+          digestion gene.
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= RIGHT COLUMN (TABS) ================= -->
+    <section class="right-column">
+      <div class="tabs">
+        <button class="tab-button active" data-tab="tank">
+          <img src="emoji/shrimp.png" alt="Fish" class="ui-emoji" /> Specimen
+        </button>
+        <button class="tab-button" data-tab="shop">
+          <img src="emoji/cart.png" alt="Shop" class="ui-emoji" /> Shop
+        </button>
+        <!-- (Strains tab removed) -->
+        <button class="tab-button" data-tab="genetics">
+          <img src="emoji/dna.png" alt="Genetics" class="ui-emoji" /> Genetics
+        </button>
+        <button class="tab-button" data-tab="achievements">
+          <img src="emoji/trophy.png" alt="Awards" class="ui-emoji" /> Awards
+        </button>
+        <button class="tab-button" data-tab="settings">
+          <img src="emoji/settings.png" alt="Settings" class="ui-emoji" /> Options
+        </button>
+      </div>
+
+      <!-- TAB 1: SPECIMEN INSPECTOR (Phenotype, Alleles & Food Genes) -->
+      <div id="tab-tank" class="tab-content active">
+        <div class="panel">
+          <h2>Inspected Medaka</h2>
+          <div id="selectedShrimp">
+            <div class="empty-selection">
+              Click a Medaka in the basin to inspect its color, fin structure, eye type, and digestive genetics.
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Basin Census</h2>
+          <div class="info-grid">
+            <div><span>Capacity</span><strong id="capacityInfo">50</strong></div>
+            <div><span>Males</span><strong id="maleCount">0</strong></div>
+            <div><span>Females</span><strong id="femaleCount">0</strong></div>
+            <div><span>Fry / Juveniles</span><strong id="juvenileCount">0</strong></div>
+            <div><span>Carrying Eggs</span><strong id="pregnantCount">0</strong></div>
+            <div><span>Spawning Mops</span><strong id="plantCount">0</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: SHOP (Broodstock, Nutrition Upgrades, Backgrounds, Basins) -->
+      <div id="tab-shop" class="tab-content">
+        <!-- 1. Broodstock Pairs -->
+        <div class="panel">
+          <h2><img src="emoji/cart.png" alt="Shop" class="ui-emoji" /> Broodstock Shop</h2>
+          <p class="small-text">
+            Purchase starter pairs. True phenotypes often conceal recessive fin, eye, or iridophore alleles.
+          </p>
+          <div id="medakaShop" class="shop-grid"></div>
+        </div>
+
+        <!-- 2. Food & Nutrition Upgrades -->
+        <div class="panel">
+          <h2><img src="emoji/food.png" alt="Diet" class="ui-emoji" /> Food & Nutrition Upgrades</h2>
+          <p class="small-text">
+            Upgrade the quality of the pellets dropped in Feed Mode to increase earnings for every bite your fish
+            consume.
+          </p>
+          <div id="foodShop" class="shop-grid"></div>
+        </div>
+
+        <!-- 3. Purchasable Basin Backgrounds -->
+        <div class="panel">
+          <h2><img src="emoji/theme.png" alt="Backgrounds" class="ui-emoji" /> Basin Backgrounds</h2>
+          <p class="small-text">
+            Change the environmental conditions of your tank.
+            <strong>Traditional Black Lacquer</strong> triggers background adaptation (*Haichi Hannou*), unlocking the
+            chance to mutate <em>Spots (Buchi)</em> and <em>Black Rim</em> patterns!
+          </p>
+          <div id="backgroundShop" class="shop-grid"></div>
+        </div>
+
+        <!-- 4. Basin Capacity Upgrades -->
+        <div class="panel">
+          <h2><img src="emoji/house.png" alt="Basins" class="ui-emoji" /> Basin Volume & Capacity</h2>
+          <div id="tankShop"></div>
+        </div>
+
+        <!-- 5. Incubation Speed Upgrades -->
+        <div class="panel">
+          <h2><img src="emoji/lightning.png" alt="Speed" class="ui-emoji" /> Incubation & Time Speed Upgrades</h2>
+          <p class="small-text">
+            Unlock advanced simulation speeds to accelerate line-breeding progress.
+          </p>
+          <div id="speedShop" class="shop-grid"></div>
+        </div>
+
+        <!-- 6. Aquatic Plants & Mops -->
+        <div class="panel">
+          <h2><img src="emoji/herb.png" alt="Plants" class="ui-emoji" /> Spawning Media & Moss</h2>
+          <div id="plantShop" class="shop-grid"></div>
+        </div>
+      </div>
+
+      <!-- TAB 3: GENETICS CODEX (Discovered vs ???) -->
+      <div id="tab-genetics" class="tab-content">
+        <div class="panel">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px;">
+            <h2 style="margin: 0;"><img src="emoji/dna.png" alt="Genetics" class="ui-emoji" /> Genetic Loci Codex</h2>
+            <span id="geneticsDiscoveryTotal" class="small-text" style="font-weight: bold; color: var(--primary);">0 /
+              44 Discovered</span>
+          </div>
+          <p class="small-text" style="margin-top: 0;">
+            Breed new medaka pairings or purchase rare broodstock to unlock undiscovered alleles across all 6 genetic
+            loci.
+          </p>
+          <div class="genetics-warning">
+            <img src="emoji/warning.png" alt="Notice" class="ui-emoji" />
+            <strong>Environmental Mutation Requirement:</strong>
+            <em>Spots</em> and <em>Black Rim</em> will <strong>never</strong> mutate in light basins.
+          </div>
+          <div id="geneticsTree"></div>
+        </div>
+      </div>
+
+      <!-- TAB 4: ACHIEVEMENTS -->
+      <div id="tab-achievements" class="tab-content">
+        <div class="panel">
+          <h2><img src="emoji/trophy.png" alt="Achievements" class="ui-emoji" /> Breeder Awards</h2>
+          <p class="small-text">
+            Unlock milestones for feeding your school, isolating rare alleles, and breeding legendary show strains.
+          </p>
+          <div id="achievementsList" class="achievements-list"></div>
+        </div>
+      </div>
+
+      <!-- TAB 5: OPTIONS & SAVE MANAGEMENT -->
+      <div id="tab-settings" class="tab-content">
+        <div class="panel">
+          <h2><img src="emoji/settings.png" alt="Settings" class="ui-emoji" /> Options</h2>
+
+          <div class="settings-row" style="margin-bottom: 25px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 10px;">
+              <img src="emoji/music.png" alt="BGM" class="ui-emoji" /> Water Ambience & BGM
+            </label>
+            <div style="display: flex; align-items: center; gap: 15px;">
+              <button id="bgmToggleBtn" class="primary-button" style="width: 100px;">Mute</button>
+              <input type="range" id="bgmVolumeSlider" aria-label="BGM Volume" min="0" max="1" step="0.05" value="0.5"
+                style="flex-grow: 1; cursor: pointer;" />
+              <span id="bgmVolumeLabel" style="width: 45px; font-weight: bold; text-align: right;">50%</span>
+            </div>
+          </div>
+
+          <div class="settings-row" style="margin-bottom: 25px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 10px;">
+              <img src="emoji/sound.png" alt="SFX" class="ui-emoji" /> Sound Effects (SFX)
+            </label>
+            <div style="display: flex; align-items: center; gap: 15px;">
+              <button id="sfxToggleBtn" class="primary-button" style="width: 100px;">Mute</button>
+              <input type="range" id="sfxVolumeSlider" aria-label="SFX Volume" min="0" max="1" step="0.05" value="0.5"
+                style="flex-grow: 1; cursor: pointer;" />
+              <span id="sfxVolumeLabel" style="width: 45px; font-weight: bold; text-align: right;">50%</span>
+            </div>
+          </div>
+
+          <div class="settings-row" style="margin-bottom: 25px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 10px;">
+              <img src="emoji/theme.png" alt="Theme" class="ui-emoji" /> Visual Theme
+            </label>
+            <div style="display: flex; align-items: center; gap: 15px;">
+              <button id="themeToggleBtn" class="secondary-button" style="width: 100px;">Dark</button>
+              <span id="themeLabel" style="font-weight: bold;">Light Mode</span>
+            </div>
+          </div>
+
+          <!-- BACKUP & RESTORE -->
+          <div class="settings-row"
+            style="margin-bottom: 25px; border-top: 1px solid var(--border); padding-top: 20px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 6px;">
+              <img src="emoji/save.png" alt="Backup" class="ui-emoji" /> Save Data Backup & Restore
+            </label>
+            <p class="small-text" style="margin-top: 0; margin-bottom: 12px;">
+              Export your line-breeding save file to your local computer so browser cache wipes never erase your
+              progress.
+            </p>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <button id="exportSaveBtn" class="primary-button">Export Save File</button>
+              <button id="importSaveBtn" class="secondary-button">Import Save File</button>
+              <input type="file" id="importSaveFileInput" accept=".json,application/json" style="display: none;"
+                aria-label="file" />
+            </div>
+          </div>
+
+          <div class="settings-row"
+            style="margin-top: 20px; display: flex; justify-content: flex-end; border-top: 1px solid var(--border); padding-top: 20px;">
+            <button id="resetButton" class="danger-button">Factory Reset Game</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CULLING TARGETS CONFIGURATION MODAL -->
+  <div id="cullingTargetsModal" class="modal hidden">
+    <div class="modal-box" style="width: min(650px, 95vw); max-height: 85vh; display: flex; flex-direction: column;">
+      <button id="closeCullingTargetsModal" class="close-button">×</button>
+      <h2 style="margin: 0 0 4px 0;">
+        <img src="emoji/target.png" alt="Targets" class="ui-emoji" /> Configure Culling Targets
+      </h2>
+      <p class="small-text" style="margin-top: 0; margin-bottom: 12px;">
+        Select alleles to flag. Offspring carrying targeted traits will be highlighted green in the nursery and blocked from quick-selling.
+      </p>
+      
+      <div style="display: flex; gap: 10px; margin-bottom: 12px; flex-shrink: 0;">
+        <button type="button" id="modalSelectAllTargetsBtn" class="primary-button" style="flex: 1; padding: 7px; font-size: 12px;">Select All Discovered</button>
+        <button type="button" id="modalClearAllTargetsBtn" class="secondary-button" style="flex: 1; padding: 7px; font-size: 12px;">Clear All</button>
+      </div>
+
+      <div id="cullingTargetsCategoriesList" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 4px;">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+  </div>
+  </main>
+
+  <!-- ================= MODALS & POPUPS ================= -->
+
+  <!-- 1. SPECIMEN DETAIL MODAL -->
+  <div id="shrimpModal" class="modal hidden">
+    <div class="modal-box">
+      <button id="closeModal" class="close-button">x</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <!-- 2. CAPACITY EXCEEDED MODAL -->
+  <div id="capacityModal" class="modal hidden">
+    <div class="modal-box">
+      <h2><img src="emoji/warning.png" alt="Warning" class="ui-emoji" /> Basin Capacity Reached</h2>
+      <p>Your medaka population has reached this basin's water volume limit.</p>
+      <p>Cull unwanted fry, sell adult specimens, or purchase larger basins in the Shop.</p>
+      <div class="capacity-actions">
+        <button id="sellOldButton" class="primary-button">Select Medaka to Sell</button>
+        <button id="openShopButton" class="secondary-button">Open Basin Shop</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. ZOOM SPECIMEN CLOSE-UP -->
+  <div id="zoomModal" class="modal" style="display: none;">
+    <div class="zoom-wrapper">
+      <img id="zoomImg" src="" alt="Close up" />
+    </div>
+  </div>
+
+  <!-- 4. BREEDER'S PEDIGREE JOURNAL MODAL -->
+  <div id="journalModal" class="modal hidden">
+    <div class="modal-box" style="width: min(750px, 95vw); max-height: 85vh; display: flex; flex-direction: column;">
+      <button id="closeJournalModal" class="close-button">x</button>
+      <h2 style="margin: 0 0 6px 0;"><img src="emoji/book.png" alt="Journal" class="ui-emoji" /> Breeder's Pedigree
+        Journal</h2>
+      <p class="small-text">Discovered genetic combinations, fin-spine ratios, and iridophore lineages.</p>
+      <div id="journalEntriesContainer"></div>
+    </div>
+  </div>
+
+  <!-- 5. ACHIEVEMENT POPUP -->
+  <div id="achievementPopup" class="achievement-popup hidden"></div>
+
+  <!-- 6. MOVE FISH POP-UP MODAL (Replaces browser prompt) -->
+  <div id="moveModal" class="modal hidden">
+    <div class="modal-box" style="width: min(500px, 95vw);">
+      <button id="closeMoveModal" class="close-button">x</button>
+      <h2 style="margin: 0 0 4px 0;">
+        <img src="emoji/herb.png" alt="Move" class="ui-emoji" /> Transfer Basin
+      </h2>
+      <p class="small-text" id="moveModalSubtitle" style="margin-top: 0; margin-bottom: 12px;">
+        Select destination basin:
+      </p>
+      <div id="moveModalTankList" style="display: flex; flex-direction: column; gap: 8px;"></div>
+    </div>
+  </div>
+
+   <!-- 7. TOP ALARM NOTIFICATION (Top Blue without Image) -->
+  <div id="toastNotification" class="toast-notification hidden"></div>
+
+  <!-- 8. AUTOMATIC FEEDER MODAL -->
+  <div id="autoFeederModal" class="modal hidden">
+    <div class="modal-box" style="width: min(520px, 95vw);">
+      <button id="closeAutoFeederModal" class="close-button">×</button>
+      <h2 style="margin: 0 0 4px 0;">
+        <img src="emoji/food.png" alt="Feeder" class="ui-emoji" /> Automatic Basin Feeder
+      </h2>
+      <p class="small-text" id="autoFeederModalSubtitle" style="margin: 0 0 14px 0;">
+        Programmed nutrition for this basin. Automatically dispenses 1 pellet every 5 seconds.
+      </p>
+
+      <!-- UNLOCKED FOODS LIST -->
+      <div id="autoFeederFoodList" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px;"></div>
+
+      <!-- TOTALS & CONFIRMATION SECTION -->
+      <div style="border-top: 1.5px solid var(--border); padding-top: 12px; margin-top: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <span style="font-weight: bold; font-size: 13px;">Total Pellets:</span>
+          <strong id="autoFeederTotalPellets" style="font-size: 14px;">0 / 500</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="font-weight: bold; font-size: 13px;">Total Cost:</span>
+          <strong id="autoFeederTotalCost" style="font-size: 16px; color: var(--success);">$0</strong>
+        </div>
+
+        <!-- RED ALERT NOTICE -->
+        <div id="autoFeederAlert" class="small-text hidden" style="color: var(--danger); font-weight: bold; margin-bottom: 10px; background: rgba(217,92,92,0.1); padding: 8px 10px; border-radius: 6px; border: 1px solid var(--danger);"></div>
+
+        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+          <button type="button" id="cancelAutoFeederBtn" class="secondary-button" style="min-width: 90px;">Cancel</button>
+          <button type="button" id="confirmAutoFeederBtn" class="primary-button" style="min-width: 100px;" disabled>Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= JAVASCRIPT ENGINE MODULES ================= -->
+  <script src="js/sounds.js"></script>
+  <script src="js/mainMenu.js"></script>
+  <script src="js/medakaConfig.js"></script>
+  <script src="js/medakaGenetics.js"></script>
+  <script src="medakaAssets.js"></script>
+  <script src="js/medakaRenderer.js"></script>
+  <script src="js/feeding.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/achievement.js"></script>
+  <script src="js/helpModal.js"></script>
+  <script src="game.js" defer></script>
+</body>
+
+</html>

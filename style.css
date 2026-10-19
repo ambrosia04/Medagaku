@@ -1,0 +1,2016 @@
+/* =========================================================
+   1. GLOBAL & BASE STYLES
+========================================================= */
+
+* {
+    box-sizing: border-box;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+input, textarea {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+
+img {
+    -webkit-user-drag: none;
+}
+
+:root {
+    --background: #f0f7f6;
+    --panel: #ffffff;
+    --text: #243238;
+    --muted: #6f8087;
+    --primary: #3b9db8;
+    --primary-dark: #2a7d94;
+    --border: #d4e3e5;
+    --danger: #d95c5c;
+    --success: #4ea86d;
+    --feed-accent: #e67e22;
+    --feed-accent-dark: #d35400;
+    --basin-shadow: rgba(30, 80, 95, 0.18);
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: var(--background);
+    color: var(--text);
+    overflow-x: hidden;
+}
+
+/* Universal utility classes */
+.hidden {
+    display: none !important;
+}
+
+.small-text {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+button {
+    font-family: inherit;
+}
+
+.primary-button,
+.secondary-button,
+.danger-button,
+.shop-button,
+.speed-button {
+    border: none;
+    border-radius: 9px;
+    padding: 9px 13px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.primary-button,
+.shop-button {
+    background: var(--primary);
+    color: #ffffff;
+}
+
+.primary-button:hover,
+.shop-button:hover {
+    background: var(--primary-dark);
+}
+
+.secondary-button {
+    background: #e5eeee;
+    color: var(--text);
+}
+
+.secondary-button:hover {
+    background: #d8e5e5;
+}
+
+.danger-button {
+    background: var(--danger);
+    color: #ffffff;
+}
+
+.danger-button:hover {
+    background: #c04848;
+}
+
+.speed-button {
+    background: #e4eeee;
+    color: var(--text);
+}
+
+.speed-button.active {
+    background: var(--primary);
+    color: #ffffff;
+}
+
+button:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* =========================================================
+   2. RARITY & 10 OFFICIAL MEDAKA COLORS
+========================================================= */
+
+.rarity-common { color: #6c6c6c; }
+.rarity-uncommon { color: #27ae60; }
+.rarity-rare { color: #2980b9; }
+.rarity-epic { color: #8e44ad; }
+.rarity-legendary {
+    color: #f1c40f;
+    text-shadow: 0 0 3px rgba(241, 196, 15, 0.4);
+}
+.rarity-special {
+    color: #2ecc71;
+    text-shadow: 0 0 6px rgba(46, 204, 113, 0.6), 0 0 12px rgba(46, 204, 113, 0.3);
+    font-weight: bold;
+}
+
+.medaka-color-brown  { color: #9b8f4e; }
+.medaka-color-yellow { color: #f8e46f; }
+.medaka-color-white  { color: #dcd8d7; }
+.medaka-color-blue   { color: #a6b8d1; }
+.medaka-color-black  { color: #252225; }
+.medaka-color-gold   { color: #d7b537; } /* NO WHITE BELLY */
+.medaka-color-amber  { color: #b48036; }
+.medaka-color-red    { color: #d4370d; } /* NO WHITE BELLY */
+.medaka-color-orange { color: #fdb900; } /* NO WHITE BELLY */
+.medaka-color-pink   { color: #fbc8ad; }
+
+/* =========================================================
+   3. UNIVERSAL INLINE ICONS & EMOJI FIXES
+========================================================= */
+
+.ui-emoji {
+    width: 18px !important;
+    height: 18px !important;
+    max-width: 18px !important;
+    max-height: 18px !important;
+    vertical-align: -2px !important;
+    object-fit: contain !important;
+    display: inline-block !important;
+    pointer-events: none;
+    margin-right: 4px;
+}
+
+.tab-button .ui-emoji {
+    width: 16px !important;
+    height: 16px !important;
+    max-width: 16px !important;
+    max-height: 16px !important;
+}
+
+/* =========================================================
+   4. HEADER & TOPBAR LAYOUT
+========================================================= */
+
+.topbar {
+    min-height: 70px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 25px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.header-save-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.header-save-controls button {
+    padding: 8px 14px;
+    font-size: 13px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.stats {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.stat {
+    background: #ebf6f7;
+    border: 1px solid #d5e9ec;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    font-size: 13px;
+}
+
+#helpBtn:hover {
+    background: #d4ecf0 !important;
+}
+
+.game-layout {
+    max-width: 1600px;
+    margin: auto;
+    padding: 16px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.65fr) minmax(360px, 1fr);
+    gap: 16px;
+    width: 100%;
+}
+
+.left-column {
+    min-width: 0;
+    width: 100%;
+    overflow: hidden;
+}
+
+.right-column {
+    min-width: 0;
+    width: 100%;
+}
+
+.panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 15px rgba(40, 80, 90, 0.04);
+}
+
+.panel h2 {
+    margin-top: 0;
+}
+
+.control-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+/* =========================================================
+   5. SEARCHABLE MULTI-SELECT & TARGET BOXES
+========================================================= */
+
+.target-group-box {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 4px 8px 6px 8px;
+    border: 1.5px solid var(--border);
+    border-radius: 9px;
+    background: rgba(59, 157, 184, 0.05);
+}
+
+.target-group-title {
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--muted);
+    line-height: 1;
+}
+
+.target-group-buttons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.multi-select-container {
+    position: relative;
+    display: inline-block;
+    z-index: 50;
+}
+
+.multi-select-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 11px;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    cursor: pointer;
+    background: #e7eeee;
+    color: var(--text);
+}
+
+.multi-select-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    width: 240px;
+    background: var(--panel);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 1000;
+}
+
+.multi-select-search-wrapper {
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+}
+
+.multi-select-search {
+    width: 100%;
+    padding: 6px 10px;
+    border: 1.5px solid var(--border);
+    border-radius: 7px;
+    font-size: 12px;
+    outline: none;
+    background: #fbfdfd;
+    color: var(--text);
+}
+
+.multi-select-list {
+    max-height: 220px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.multi-select-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    color: var(--text);
+}
+
+.multi-select-item:hover {
+    background: rgba(59, 157, 184, 0.12);
+}
+
+/* =========================================================
+   6. AQUARIUM / BASIN VIEWPORT & 4 WATER THEMES
+========================================================= */
+
+.left-column-grid {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.aquarium-panel {
+    padding: 16px 18px 14px;
+}
+
+.panel-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.tank-status {
+    background: #e6f3f3;
+    padding: 7px 12px;
+    border-radius: 9px;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+/* Main Basin Waterport */
+.aquarium {
+    position: relative;
+    width: 100%;
+    height: 620px;
+    overflow: hidden;
+    border-radius: 14px;
+    border: 8px solid #9fbcc1;
+    background:
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,0.35), transparent 10%),
+        linear-gradient(to bottom, #9ddae5 0%, #74c6d6 45%, #4eabbf 100%);
+    box-shadow:
+        inset 0 0 45px var(--basin-shadow),
+        0 8px 24px rgba(30, 70, 80, 0.15);
+    transition: background 0.5s ease, border-color 0.5s ease;
+}
+
+/* Cursor when Feeding Mode is Active */
+.aquarium.feed-mode-active {
+    cursor: crosshair !important;
+}
+
+/* The 4 Purchasable Water Themes */
+.aquarium.bg-blue {
+    background:
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,0.35), transparent 10%),
+        linear-gradient(to bottom, #9ddae5 0%, #74c6d6 45%, #4eabbf 100%);
+    border-color: #9fbcc1;
+}
+
+.aquarium.bg-white {
+    background:
+        radial-gradient(circle at 30% 15%, rgba(255,255,255,0.8), transparent 25%),
+        linear-gradient(to bottom, #ffffff 0%, #eef3f5 55%, #dde5e8 100%);
+    border-color: #cfd8dc;
+}
+
+.aquarium.bg-moss {
+    background:
+        radial-gradient(circle at 20% 20%, rgba(200,255,200,0.25), transparent 15%),
+        linear-gradient(to bottom, #60966f 0%, #3e734e 45%, #255234 100%);
+    border-color: #4b6f57;
+}
+
+/* ★ TRADITIONAL BLACK LACQUER BASIN (Kuro-suiso / Haichi Hannou) */
+.aquarium.bg-black {
+    background:
+        radial-gradient(circle at 50% 20%, rgba(45, 60, 65, 0.45) 0%, transparent 60%),
+        linear-gradient(to bottom, #181d1f 0%, #0d1011 50%, #040506 100%);
+    border-color: #2c1a16; /* Deep Japanese lacquer rim */
+    box-shadow:
+        inset 0 0 60px rgba(0, 0, 0, 0.95),
+        0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+.water-surface {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 16px;
+    background: rgba(255, 255, 255, 0.22);
+    pointer-events: none;
+    z-index: 14;
+}
+
+.bubble {
+    position: absolute;
+    bottom: 45px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.55);
+    animation: bubbleRise 6s linear infinite;
+    pointer-events: none;
+}
+
+.bubble1 { left: 16%; animation-delay: 0s; }
+.bubble2 { left: 42%; animation-delay: 2.2s; }
+.bubble3 { left: 70%; animation-delay: 4.1s; }
+.bubble4 { left: 88%; animation-delay: 1.1s; }
+
+@keyframes bubbleRise {
+    0% { transform: translateY(0); opacity: 0; }
+    15% { opacity: 0.9; }
+    100% { transform: translateY(-540px); opacity: 0; }
+}
+
+.plant {
+    position: absolute;
+    bottom: 30px;
+    opacity: 0.75;
+    pointer-events: none;
+    z-index: 4;
+}
+
+.plant-left { left: 4%; }
+.plant-right { right: 4%; }
+
+.plant-floater {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background-image: url('plants/berriedPlant.png');
+    background-repeat: repeat-x;
+    background-size: auto 100%;
+    z-index: 6;
+    pointer-events: none;
+    opacity: 0.85;
+}
+
+.sand {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 38px;
+    background-image: url('plants/sand.png');
+    background-repeat: repeat-x;
+    background-position: bottom;
+    background-size: auto 100%;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.aquarium-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+}
+
+.aquarium-help {
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.aquarium-sell-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* =========================================================
+   7. INTERACTIVE FEEDING SYSTEM & FALLING PELLETS
+========================================================= */
+
+.food-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 12;
+    overflow: hidden;
+}
+
+/* Dropped Food Pellets */
+.food-pellet {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #f39c12, #b9770e);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.2s ease;
+}
+
+/* Food Tier Palette Variants */
+.food-pellet.tier-flake {
+    width: 10px;
+    height: 5px;
+    border-radius: 40% 60% 70% 30%;
+    background: linear-gradient(135deg, #e67e22, #c0392b);
+}
+
+.food-pellet.tier-daphnia {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #f1c40f, #d35400);
+}
+
+.food-pellet.tier-brine {
+    width: 9px;
+    height: 8px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #ff7675, #d63031);
+    box-shadow: 0 0 4px rgba(255, 118, 117, 0.7);
+}
+
+/* Feed Mode Toggle Button State */
+#feedModeBtn.active {
+    background-color: var(--feed-accent-dark) !important;
+    box-shadow: 0 0 10px rgba(230, 126, 34, 0.65);
+    animation: feedPulse 1.8s infinite alternate;
+}
+
+@keyframes feedPulse {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.03); }
+}
+
+/* Floating Cash / Reward Text When Eaten */
+.floating-cash {
+    position: absolute;
+    font-size: 14px;
+    font-weight: bold;
+    color: #2ecc71;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+    pointer-events: none;
+    z-index: 100;
+    transform: translate(-50%, -50%);
+    animation: cashFloatUp 0.85s ease-out forwards;
+}
+
+@keyframes cashFloatUp {
+    0% { transform: translate(-50%, 0) scale(0.9); opacity: 0; }
+    20% { transform: translate(-50%, -10px) scale(1.15); opacity: 1; }
+    100% { transform: translate(-50%, -38px) scale(1); opacity: 0; }
+}
+
+/* Food Satiety & Digestion Meter in Specimen Card */
+.satiety-bar-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-top: 6px;
+}
+
+.satiety-bar {
+    width: 100%;
+    height: 8px;
+    background: #e5eeee;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.satiety-fill {
+    height: 100%;
+    background: var(--feed-accent);
+    transition: width 0.3s ease;
+}
+
+.satiety-fill.full {
+    background: #e74c3c;
+}
+
+/* =========================================================
+   8. MODULAR MEDAKA FISH SPRITES (144x144 Canvas Containers)
+========================================================= */
+
+#medakaLayer {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    pointer-events: none; /* Allows clicks to pass through empty water to eggs and substrate */
+}
+
+.medaka,
+.shrimp {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 90px;
+    height: 90px;
+    cursor: pointer;
+    z-index: 10;
+    user-select: none;
+    transform-origin: center center;
+    transition: filter 0.2s ease, opacity 0.3s ease;
+    pointer-events: auto !important;
+}
+
+.medaka:hover,
+.shrimp:hover {
+    filter: brightness(1.22) drop-shadow(0 0 6px rgba(255,255,255,0.9));
+}
+
+.medaka-sprite-canvas,
+.shrimp-body-wrapper canvas,
+.shrimp-body-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    display: block;
+}
+
+/* Life Stage Scales */
+.baby-shrimp, .baby-medaka { transform: scale(0.48); }
+.juvenile-shrimp, .juvenile-medaka { transform: scale(0.72); }
+
+/* Daruma Vertebral Compression silhouette scaling */
+.medaka.daruma,
+.medaka.hikari-daruma {
+    transform: scaleX(0.76) scaleY(1.12);
+}
+
+/* Ventral Egg Cluster (Carried outside the urogenital pore) */
+.vent-egg-cluster,
+.egg-cluster {
+    position: absolute;
+    left: 40px;
+    bottom: 50px;
+    width: 22px;
+    height: 16px;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.egg {
+    position: absolute;
+    width: 6.5px;
+    height: 6.5px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #ffffff 0%, #f4e89f 50%, #b89c36 100%);
+    border: 0.5px solid rgba(255, 255, 255, 0.4);
+    box-shadow: inset -1px -1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.egg:nth-child(1) { left: 0px; top: 2px; }
+.egg:nth-child(2) { left: 5px; top: 0px; }
+.egg:nth-child(3) { left: 9px; top: 4px; }
+.egg:nth-child(4) { left: 4px; top: 7px; }
+.egg:nth-child(5) { left: 11px; top: 8px; }
+
+/* Target Highlights */
+.medaka.tank-highlighted,
+.shrimp.tank-highlighted {
+    filter: drop-shadow(0 0 6px #2ecc71) drop-shadow(0 0 14px rgba(46, 204, 113, 0.95)) brightness(1.25);
+    z-index: 30 !important;
+}
+
+.medaka.tank-dimmed,
+.shrimp.tank-dimmed {
+    opacity: 0.22;
+    filter: grayscale(0.8) brightness(0.65);
+}
+
+/* Name tag popup on hover */
+.shrimp-name-tag,
+.medaka-name-tag {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: -12px;
+    white-space: nowrap;
+    font-size: 10px;
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 2px 6px;
+    border-radius: 4px;
+    opacity: 0;
+    pointer-events: none;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    color: #1a2a2e;
+}
+
+.medaka:hover .shrimp-name-tag,
+.medaka:hover .medaka-name-tag,
+.shrimp:hover .shrimp-name-tag {
+    opacity: 1;
+}
+
+/* =========================================================
+   9. SIDEBAR FISH LIST
+========================================================= */
+
+.shrimp-list-column {
+    width: 320px;
+    flex-shrink: 0;
+    margin-bottom: 0 !important;
+}
+
+.movable-header {
+    padding: 10px 15px;
+    background: #eef7f5;
+    border-bottom: 1.5px solid var(--border);
+    cursor: move;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    user-select: none;
+}
+
+.shrimp-list-column .movable-body {
+    height: 560px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px 6px 8px 8px;
+    background: #fbfdfd;
+}
+
+.shrimp-list-item {
+    display: flex;
+    align-items: center;
+    background: #f3f8f8;
+    border: 1.5px solid var(--border);
+    border-radius: 9px;
+    padding: 6px 10px;
+    gap: 10px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.shrimp-list-item:hover {
+    background: #eaf3f3;
+}
+
+.shrimp-list-item.selected-shrimp-card {
+    background: rgba(59, 157, 184, 0.12) !important;
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 8px rgba(59, 157, 184, 0.25);
+}
+
+.shrimp-list-item.tank-filter-highlighted {
+    background: rgba(46, 204, 113, 0.15) !important;
+    border: 2px solid #2ecc71 !important;
+}
+
+.shrimp-list-thumb {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.shrimp-list-thumb canvas,
+.shrimp-list-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* =========================================================
+   10. TABS & RIGHT INSPECTION PANEL
+========================================================= */
+
+.tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 14px;
+    width: 100%;
+}
+
+.tab-button {
+    flex: 1;
+    text-align: center;
+    border: none;
+    background: #e0eded;
+    padding: 10px 4px;
+    font-size: 13px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    white-space: nowrap;
+    color: var(--text);
+}
+
+.tab-button:hover {
+    background: #d1e5e6;
+}
+
+.tab-button.active {
+    background: var(--primary);
+    color: #ffffff;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Info grid */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.info-grid > div {
+    padding: 11px;
+    background: #f1f7f7;
+    border-radius: 9px;
+}
+
+.info-grid span {
+    display: block;
+    font-size: 11px;
+    color: var(--muted);
+}
+
+.info-grid strong {
+    display: block;
+    margin-top: 4px;
+    font-size: 18px;
+}
+
+/* Selected Fish Detailed Card */
+.selected-card {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 16px;
+    align-items: center;
+}
+
+.selected-image {
+    width: 110px;
+    height: 110px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.selected-image canvas,
+.selected-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.detail-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+
+.detail-item {
+    background: #f2f7f7;
+    padding: 6px 9px;
+    border-radius: 7px;
+}
+
+.detail-item span {
+    display: block;
+    font-size: 10px;
+    color: var(--muted);
+}
+
+.detail-item strong {
+    display: block;
+    margin-top: 2px;
+    font-size: 12px;
+}
+
+/* Shop and Collection Grids */
+.shop-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.shop-card {
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    padding: 12px;
+    background: #fbfdfd;
+}
+
+.shop-card h3 {
+    margin: 0 0 5px;
+    font-size: 15px;
+}
+
+.shop-price {
+    font-weight: bold;
+    margin: 8px 0;
+    color: var(--primary-dark);
+}
+
+.shrimp-preview {
+    width: 160px;
+    height: 80px;
+    margin: 4px auto 10px auto;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.shrimp-preview canvas,
+.shrimp-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.collection-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.collection-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    min-height: 125px;
+    background: #fbfdfd;
+}
+
+.collection-card.locked {
+    opacity: .38;
+    filter: grayscale(1);
+}
+
+/* Genetics Tab Tree */
+.genetics-warning {
+    margin: 14px 0;
+    padding: 12px;
+    background: #fff8e1;
+    border: 1px solid #fae19c;
+    border-radius: 9px;
+    font-size: 12.5px;
+    color: #795548;
+}
+
+.genetic-family {
+    margin-bottom: 16px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+
+.genetic-family h3 {
+    margin-top: 0;
+}
+
+.genetic-node {
+    display: inline-block;
+    margin: 3px;
+    padding: 5px 9px;
+    border-radius: 7px;
+    background: #edf5f5;
+    font-size: 12px;
+    border: 1px solid transparent;
+}
+
+.genetic-node.discovered {
+    border-color: var(--primary);
+    background: #e1f2f5;
+    font-weight: bold;
+}
+
+/* Achievements List */
+.achievements-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.achievement-card {
+    display: flex;
+    align-items: center;
+    background: #f4f9f9;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    gap: 14px;
+}
+
+.achievement-img-wrapper {
+    width: 58px;
+    height: 58px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    background: rgba(59, 157, 184, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.achievement-card.locked {
+    opacity: 0.45;
+    filter: grayscale(1);
+}
+
+/* =========================================================
+   11. MODALS & CULLING HARVEST SCREEN
+========================================================= */
+
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 30, 35, 0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10005 !important;
+    padding: 15px;
+}
+
+.modal-box {
+    background: white;
+    width: min(640px, 100%);
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 14px;
+    padding: 18px 22px;
+    position: relative;
+    box-shadow: 0 15px 45px rgba(0,0,0,0.3);
+}
+
+.close-button {
+    position: absolute;
+    right: 14px;
+    top: 10px;
+    border: none;
+    background: transparent;
+    font-size: 26px;
+    cursor: pointer;
+    line-height: 1;
+    color: var(--muted);
+}
+
+.close-button:hover {
+    color: var(--danger);
+}
+
+.capacity-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+.cull-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 8px;
+    max-height: 480px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.cull-row {
+    display: flex;
+    align-items: center;
+    background: #f4f9f9;
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    gap: 12px;
+}
+
+.cull-buttons {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.cull-media {
+    width: 55px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.cull-media canvas,
+.cull-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.cull-info {
+    flex-grow: 1;
+    min-width: 0;
+    line-height: 1.3;
+}
+
+/* Zoom Specimen Close-Up */
+.zoom-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image: url('images/zoomBG.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: min(600px, 92vw);
+    height: min(460px, 72vh);
+    padding: 30px;
+    filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.65));
+}
+
+#zoomImg {
+    max-width: 82%;
+    max-height: 82%;
+    object-fit: contain;
+    pointer-events: none;
+}
+
+/* Floating Slideout Achievement Popup */
+.achievement-popup {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translate(-50%, 60px);
+    background: #1b282c;
+    border: 2px solid #f1c40f;
+    border-radius: 12px;
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 10px rgba(241, 196, 15, 0.2);
+    z-index: 99999;
+    color: #e6f2f4;
+    pointer-events: none;
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+    width: min(420px, 95vw);
+    overflow: hidden;
+}
+
+.achievement-popup.active {
+    transform: translate(-50%, 0);
+    opacity: 1;
+}
+
+/* =========================================================
+   12. TITLE SCREEN / MAIN MENU
+========================================================= */
+
+body:has(.main-menu-overlay:not(.hidden)) {
+    overflow: hidden;
+}
+
+.main-menu-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: var(--background);
+    background-image: url('images/bg.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+}
+
+.menu-box {
+    position: relative; /* Required for absolute positioning of the background layer */
+    background: transparent;
+    border: none;
+    padding: 40px; /* Reduced padding slightly since we handle layout internally */
+    width: min(440px, 92vw);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 1;
+}
+
+/* Semi-transparent background panel layer (70% transparent / 30% opacity) */
+.menu-box::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url('images/box.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    opacity: 0.9; /* 0.3 opacity = 70% transparency level */
+    z-index: -1;  /* Places the background behind the text/buttons */
+    pointer-events: none;
+}
+
+.menu-title {
+    font-size: 32px;
+    margin: 0 0 25px 0;
+    color: var(--text);
+    font-weight: bold;
+}
+
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+.menu-btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+}
+
+/* =========================================================
+   13. DARK THEME OVERRIDES
+========================================================= */
+
+body.dark-theme {
+    --background: #111d21;
+    --panel: #1b282c;
+    --text: #e6f2f4;
+    --muted: #8fa0a5;
+    --border: #293a3e;
+    --primary: #5cb6d3;
+    --primary-dark: #449cb9;
+}
+
+body.dark-theme .tank-status,
+body.dark-theme .stat {
+    background: #1e2f33;
+    color: var(--text);
+    border-color: #293c40;
+}
+
+body.dark-theme .genetics-warning {
+    background: #2d2412;
+    border-color: #5c431a;
+    color: #ffd875;
+}
+
+body.dark-theme .modal-box {
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+body.dark-theme .movable-header {
+    background: #1e2f33;
+    color: var(--text);
+}
+
+body.dark-theme .shrimp-list-column .movable-body {
+    background: var(--panel);
+}
+
+body.dark-theme .shrimp-list-item,
+body.dark-theme .detail-item,
+body.dark-theme .info-grid > div,
+body.dark-theme .shop-card,
+body.dark-theme .collection-card,
+body.dark-theme .cull-row,
+body.dark-theme .achievement-card {
+    background: #1a2a2e;
+    border-color: var(--border);
+    color: var(--text);
+}
+
+body.dark-theme .tab-button,
+body.dark-theme .secondary-button,
+body.dark-theme .speed-button,
+body.dark-theme .genetic-node {
+    background: #25393d;
+    color: var(--muted);
+}
+
+body.dark-theme .tab-button.active,
+body.dark-theme .speed-button.active {
+    background: var(--primary);
+    color: #ffffff;
+}
+
+body.dark-theme .multi-select-btn {
+    background: #25393d;
+    color: var(--text);
+    border-color: var(--border);
+}
+
+body.dark-theme .multi-select-menu {
+    background: #1b282c;
+    border-color: var(--border);
+}
+
+body.dark-theme .multi-select-search {
+    background: #152429;
+    color: var(--text);
+    border-color: var(--border);
+}
+
+body.dark-theme .multi-select-item:hover {
+    background: rgba(92, 182, 211, 0.2);
+}
+
+body.dark-theme .shrimp-name-tag,
+body.dark-theme .medaka-name-tag {
+    background: rgba(27, 40, 44, 0.9);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+/* =========================================================
+   14. RESPONSIVE MEDIA QUERIES
+========================================================= */
+
+@media (max-width: 1200px) {
+    .left-column-grid {
+        flex-direction: column;
+    }
+    .shrimp-list-column {
+        width: 100% !important;
+    }
+}
+
+@media (max-width: 1000px) {
+    .game-layout {
+        grid-template-columns: 1fr;
+    }
+    .aquarium {
+        height: 500px;
+    }
+}
+
+@media (max-width: 600px) {
+    .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .stats {
+        width: 100%;
+    }
+    .aquarium {
+        height: 420px;
+    }
+    .shop-grid {
+        grid-template-columns: 1fr;
+    }
+    .collection-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .info-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.fish-sprite {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: left center;
+}
+
+/* =========================================================
+   BOTTOM NURSERY SPREAD EGG CLUSTERS (Clickable on top of sand)
+========================================================= */
+
+.bottom-egg-cluster {
+    position: absolute;
+    left: 10%;
+    right: 10%;
+    bottom: 26px; /* Sits right above the sand bed */
+    height: 30px;
+    z-index: 40 !important; /* Above all fish, plants, and sand */
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.bottom-egg-cluster:hover {
+    transform: scale(1.08);
+    filter: drop-shadow(0 0 8px rgba(244, 232, 159, 1)) brightness(1.25);
+}
+
+.bottom-egg-mound {
+    position: relative;
+    width: 32px;
+    height: 20px;
+    pointer-events: none; /* Passes click to parent cluster */
+}
+
+.bottom-egg-mound .egg {
+    position: absolute;
+    width: 8.5px;
+    height: 8.5px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #ffffff 0%, #f4e89f 50%, #b89c36 100%);
+    border: 0.5px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4), inset -1px -1px 2px rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+}
+
+.bottom-egg-mound .egg:nth-child(1) { left: 2px;  bottom: 2px; }
+.bottom-egg-mound .egg:nth-child(2) { left: 8px;  bottom: 0px; }
+.bottom-egg-mound .egg:nth-child(3) { left: 15px; bottom: 3px; }
+.bottom-egg-mound .egg:nth-child(4) { left: 22px; bottom: 1px; }
+.bottom-egg-mound .egg:nth-child(5) { left: 6px;  bottom: 8px; }
+.bottom-egg-mound .egg:nth-child(6) { left: 14px; bottom: 8px; }
+
+/* =========================================================
+   FEMALE EGG CYCLE PROGRESS BAR
+========================================================= */
+
+.egg-cycle-bar-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border);
+}
+
+.egg-cycle-bar {
+    width: 100%;
+    height: 8px;
+    background: #e5eeee;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.egg-cycle-fill {
+    height: 100%;
+    transition: width 0.3s ease, background 0.3s ease;
+}
+
+/* Resting State: Calm Blue */
+.egg-cycle-fill.stage-resting {
+    background: #3b9db8;
+}
+
+/* Has Eggs State: Warm Golden Amber */
+.egg-cycle-fill.stage-has_eggs {
+    background: #f1c40f;
+}
+
+/* Dropping Eggs State: Energetic Pulsing Coral/Green */
+.egg-cycle-fill.stage-dropping_eggs {
+    background: #e67e22;
+    animation: eggDroppingPulse 1s infinite alternate ease-in-out;
+}
+
+@keyframes eggDroppingPulse {
+    0% { filter: brightness(1); }
+    100% { filter: brightness(1.3) drop-shadow(0 0 3px rgba(230, 126, 34, 0.8)); }
+}
+
+/* =========================================================
+   GENETICS CODEX: DISCOVERED VS LOCKED (???) CARDS
+========================================================= */
+
+.genetics-category {
+    margin-bottom: 20px;
+    padding: 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    background: rgba(59, 157, 184, 0.03);
+}
+
+.genetics-category-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.genetics-category-header h3 {
+    margin: 0;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.genetics-category-count {
+    font-size: 12px;
+    font-weight: bold;
+    color: var(--muted);
+}
+
+.allele-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px;
+}
+
+.allele-card {
+    border-radius: 9px;
+    padding: 10px 12px;
+    border: 1.5px solid var(--border);
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 85px; /* Ensures enough breathing room for multi-line text */
+    transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+/* Discovered: Vibrant & Clean */
+.allele-card.discovered {
+    border-color: var(--primary);
+    box-shadow: 0 2px 6px rgba(59, 157, 184, 0.08);
+}
+
+.allele-card.discovered:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary-dark);
+}
+
+/* Locked: Greyed out with ??? */
+.allele-card.locked {
+    background: #f1f5f5;
+    border-style: dashed;
+    border-color: #cbd7d8;
+    opacity: 0.65;
+    filter: grayscale(1);
+}
+
+.allele-header-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.allele-swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.allele-swatch.locked {
+    background: #aab5b8 !important;
+    border: 1px dashed #7f8c8d;
+}
+
+.allele-name {
+    font-size: 12.5px;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.allele-card.locked .allele-name {
+    color: var(--muted);
+    letter-spacing: 2px;
+}
+
+/* Allow text to wrap cleanly without cutting off mid-word */
+.allele-desc {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.35;
+    white-space: normal;
+    overflow: visible;
+    display: block;
+}
+
+/* Dark Mode Support */
+body.dark-theme .allele-card {
+    background: #1b282c;
+    border-color: var(--border);
+}
+
+body.dark-theme .allele-card.discovered {
+    border-color: var(--primary);
+}
+
+body.dark-theme .allele-card.locked {
+    background: #142023;
+    border-color: #27373b;
+    opacity: 0.55;
+}
+
+/* =========================================================
+   NURSERY UNDISCOVERED GENETICS HIGHLIGHTS
+========================================================= */
+
+.undiscovered-trait {
+    color: #e74c3c !important;
+    font-weight: bold !important;
+    background: rgba(231, 76, 60, 0.08);
+    padding: 1px 4px;
+    border-radius: 4px;
+}
+
+.new-genetics-badge {
+    background: #e74c3c;
+    color: #ffffff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    display: inline-block;
+    animation: newBadgePulse 1.4s infinite alternate ease-in-out;
+}
+
+@keyframes newBadgePulse {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.05); filter: drop-shadow(0 0 3px rgba(231, 76, 60, 0.6)); }
+}
+
+/* =========================================================
+   INSPECTED / SELECTED FISH HIGHLIGHT
+========================================================= */
+
+.medaka.inspected-highlight {
+    z-index: 50 !important;
+    animation: inspectedGlowPulse 1.6s infinite alternate ease-in-out;
+}
+
+@keyframes inspectedGlowPulse {
+    0% {
+        filter: drop-shadow(0 0 6px #f1c40f) drop-shadow(0 0 14px rgba(241, 196, 15, 0.75)) brightness(1.2);
+    }
+    100% {
+        filter: drop-shadow(0 0 10px #ffeaa7) drop-shadow(0 0 22px rgba(241, 196, 15, 0.95)) brightness(1.35);
+    }
+}
+
+/* Pin name tag above the inspected fish so you can track it easily */
+.medaka.inspected-highlight .medaka-name-tag {
+    opacity: 1 !important;
+    background: #f1c40f !important;
+    color: #1a2a2e !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    font-weight: 800;
+}
+
+/* =========================================================
+   STABLE NURSERY CULLING MODAL (Zero jumping between clutches)
+========================================================= */
+
+#shrimpModal .modal-box {
+    height: 600px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+#shrimpModal h2 {
+    margin: 0 0 4px 0;
+    flex-shrink: 0;
+}
+
+#shrimpModal p.small-text {
+    margin: 0;
+    flex-shrink: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#shrimpModal .cull-bulk-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 12px 0 10px 0;
+    flex-shrink: 0;
+}
+
+#shrimpModal .cull-bulk-actions button {
+    width: 100%;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 13.5px;
+}
+
+#shrimpModal .cull-list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    margin-top: 4px;
+}
+
+/* =========================================================
+   FISH LIST SELECT MODE STYLES
+========================================================= */
+
+.shrimp-list-item.select-mode-active {
+    background: rgba(46, 204, 113, 0.15) !important;
+    border-color: #2ecc71 !important;
+    box-shadow: 0 0 8px rgba(46, 204, 113, 0.35);
+}
+
+.select-check-badge {
+    background: #2ecc71;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: bold;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* =========================================================
+   INSPECT CARD ACTIONS & MOVE MODAL
+========================================================= */
+
+.inspect-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.inspect-actions button {
+    flex: 1;
+    padding: 7px 10px;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.move-tank-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 14px 0 6px 0;
+}
+
+.move-tank-btn {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 14px;
+    border-radius: 9px;
+    border: 1.5px solid var(--border);
+    background: #f4f8f8;
+    color: var(--text);
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 13px;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.move-tank-btn:hover:not(:disabled) {
+    background: rgba(59, 157, 184, 0.12);
+    border-color: var(--primary);
+}
+
+.move-tank-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #eaeaea;
+}
+
+/* Nursery destination dropdown box */
+.cull-destination-box {
+    margin: 8px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: rgba(59, 157, 184, 0.08);
+    padding: 8px 12px;
+    border-radius: 9px;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+/* =========================================================
+   TOP ALARM & NOTICE TOAST (Blue, No Image, Top-Pinned)
+========================================================= */
+
+.toast-notification {
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translate(-50%, -70px);
+    background: #162429;
+    border: 2px solid var(--primary);
+    border-radius: 10px;
+    padding: 10px 20px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), inset 0 0 10px rgba(59, 157, 184, 0.2);
+    z-index: 100000;
+    color: #e6f2f4;
+    pointer-events: none;
+    opacity: 0;
+    transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.25s ease;
+    width: min(390px, 92vw);
+    text-align: center;
+}
+
+.toast-notification.active {
+    transform: translate(-50%, 0);
+    opacity: 1;
+}
+
+.toast-title {
+    display: block;
+    font-size: 13.5px;
+    font-weight: bold;
+    color: var(--primary);
+    letter-spacing: 0.3px;
+    margin-bottom: 2px;
+}
+
+.toast-desc {
+    display: block;
+    font-size: 12px;
+    color: #cbd8dc;
+    line-height: 1.4;
+}
+
+body.dark-theme .allele-card {
+    background: #1a2a2e !important;
+    color: var(--text) !important;
+    border-color: var(--border) !important;
+}
+
+body.dark-theme .allele-card.discovered {
+    border-color: var(--primary);
+}
+
+body.dark-theme .allele-card span {
+    color: var(--text);
+}
+
+.medaka[id*="gfp"], .medaka:has(canvas) {
+  /* Dynamic check or class hook */
+}
+
+.medaka-gfp-glow {
+  filter: drop-shadow(0 0 8px #2ecc71) drop-shadow(0 0 16px rgba(46, 204, 113, 0.8));
+  animation: gfpNeonPulse 2s infinite alternate ease-in-out;
+}
+
+@keyframes gfpNeonPulse {
+  0% { filter: drop-shadow(0 0 6px #2ecc71) drop-shadow(0 0 12px rgba(46, 204, 113, 0.6)) brightness(1.1); }
+  100% { filter: drop-shadow(0 0 12px #2ecc71) drop-shadow(0 0 24px rgba(46, 204, 113, 0.95)) brightness(1.25); }
+}
+
+.medaka-fuchsia-glow {
+  filter: drop-shadow(0 0 10px #d642df) drop-shadow(0 0 20px rgba(214, 66, 223, 0.85)) brightness(1.2);
+  animation: fuchsiaNeonPulse 1.8s infinite alternate ease-in-out;
+}
+
+@keyframes fuchsiaNeonPulse {
+  0% { filter: drop-shadow(0 0 8px #d642df) drop-shadow(0 0 16px rgba(214, 66, 223, 0.6)) brightness(1.15); }
+  100% { filter: drop-shadow(0 0 14px #d642df) drop-shadow(0 0 28px rgba(214, 66, 223, 0.95)) brightness(1.3); }
+}
+
+/* Locked Speed Buttons */
+.speed-button:disabled,
+.speed-button.locked {
+    opacity: 0.38 !important;
+    filter: grayscale(0.85);
+    cursor: not-allowed !important;
+    background: #dde5e5;
+    color: var(--muted);
+}
+
+body.dark-theme .speed-button:disabled,
+body.dark-theme .speed-button.locked {
+    opacity: 0.35 !important;
+    background: #182326;
+    color: #55666a;
+}
+
+/* =========================================================
+   SHOP SILHOUETTE & PURCHASE CONFETTI
+========================================================= */
+
+/* Silhouette blackout for undiscovered shop medaka */
+.shop-card.locked-preview .shop-preview-cvs {
+    filter: brightness(0) opacity(0.35);
+    transition: filter 0.3s ease;
+}
+
+/* Confetti particle elements */
+.confetti-particle {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 99999;
+    animation: confettiPop 0.8s ease-out forwards;
+}
+
+@keyframes confettiPop {
+    0% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--tx), var(--ty)) scale(0) rotate(720deg);
+        opacity: 0;
+    }
+}
