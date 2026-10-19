@@ -13,9 +13,6 @@
       this.bindHeaderEvents();
     },
 
-    /**
-     * Injects the title screen DOM overlay if not already present.
-     */
     createMenuOverlay() {
       if (document.getElementById('mainMenuOverlay')) return;
 
@@ -38,18 +35,15 @@
           </p>
 
           <div class="menu-buttons">
-            ${
-              hasSave
-                ? `<button id="menuContinueBtn" class="primary-button menu-btn">
-                     Continue (${saveSnippet})
-                   </button>
-                   <button id="menuNewGameBtn" class="secondary-button menu-btn">
-                     New Game
-                   </button>`
-                : `<button id="menuStartBtn" class="primary-button menu-btn">
-                     Start Breeding
-                   </button>`
-            }
+            <button id="menuContinueBtn" class="primary-button menu-btn ${!hasSave ? 'hidden' : ''}">
+              Continue (${saveSnippet})
+            </button>
+            <button id="menuStartBtn" class="primary-button menu-btn ${hasSave ? 'hidden' : ''}">
+              Start Breeding
+            </button>
+            <button id="menuNewGameBtn" class="secondary-button menu-btn ${!hasSave ? 'hidden' : ''}">
+              New Game
+            </button>
             <button id="menuGuideBtn" class="secondary-button menu-btn">
               <img src="emoji/info.png" class="ui-emoji" alt="Guide" /> How to Play & Genetics Guide
             </button>
@@ -70,9 +64,6 @@
       this.renderMenuFish();
     },
 
-    /**
-     * Reads quick stats from local storage for the Continue button label.
-     */
     getSaveSnippet() {
       try {
         const raw = localStorage.getItem('medaka_genetics_save');
@@ -84,9 +75,6 @@
       }
     },
 
-    /**
-     * Draws animated sample Medaka on either side of the title.
-     */
     renderMenuFish() {
       if (!window.medakaRendererInstance) return;
 
@@ -143,11 +131,13 @@
       if (newGameBtn) {
         newGameBtn.addEventListener('click', () => {
           if (confirm('Start a new lineage? This will overwrite your existing save data.')) {
+            window.isResetting = true;
             localStorage.removeItem('medaka_genetics_save');
             window.location.reload();
           }
         });
       }
+
 
       if (guideBtn) {
         guideBtn.addEventListener('click', () => {
@@ -168,15 +158,11 @@
       }
     },
 
-    /**
-     * Hides the title screen and unlocks the audio context.
-     */
     enterGame() {
       if (this.overlay) {
         this.overlay.classList.add('hidden');
       }
 
-      // Unlock browser audio context on user gesture
       if (window.soundManager && window.soundManager.unlockAudio) {
         window.soundManager.unlockAudio();
       }
@@ -190,10 +176,20 @@
         this.createMenuOverlay();
       } else {
         this.overlay.classList.remove('hidden');
-        // Refresh continue button details
         const contBtn = document.getElementById('menuContinueBtn');
+        const startBtn = document.getElementById('menuStartBtn');
+        const newGameBtn = document.getElementById('menuNewGameBtn');
+        const hasSave = !!localStorage.getItem('medaka_genetics_save');
+
         if (contBtn) {
           contBtn.textContent = `Continue (${this.getSaveSnippet()})`;
+          contBtn.classList.toggle('hidden', !hasSave);
+        }
+        if (startBtn) {
+          startBtn.classList.toggle('hidden', hasSave);
+        }
+        if (newGameBtn) {
+          newGameBtn.classList.toggle('hidden', !hasSave);
         }
       }
     }
