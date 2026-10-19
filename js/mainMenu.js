@@ -157,6 +157,53 @@
         });
       }
     },
+    
+    bindMenuEvents() {
+      const continueBtn = document.getElementById('menuContinueBtn');
+      const startBtn = document.getElementById('menuStartBtn');
+      const newGameBtn = document.getElementById('menuNewGameBtn');
+      const guideBtn = document.getElementById('menuGuideBtn');
+      const newGameModal = document.getElementById('newGameModal');
+      const cancelModalBtn = document.getElementById('cancelNewGameModalBtn');
+      const confirmModalBtn = document.getElementById('confirmNewGameModalBtn');
+
+      if (continueBtn) {
+        continueBtn.addEventListener('click', () => this.enterGame());
+      }
+
+      if (startBtn) {
+        startBtn.addEventListener('click', () => this.enterGame());
+      }
+
+      if (newGameBtn && newGameModal) {
+        newGameBtn.addEventListener('click', () => {
+          newGameModal.classList.remove('hidden');
+        });
+      }
+
+      if (cancelModalBtn && newGameModal) {
+        cancelModalBtn.addEventListener('click', () => {
+          newGameModal.classList.add('hidden');
+        });
+      }
+
+      if (confirmModalBtn) {
+        confirmModalBtn.addEventListener('click', () => {
+          window.isResetting = true;
+          localStorage.removeItem('medaka_genetics_save');
+          if (newGameModal) newGameModal.classList.add('hidden');
+          window.location.reload();
+        });
+      }
+
+      if (guideBtn) {
+        guideBtn.addEventListener('click', () => {
+          if (window.openHelpModal) {
+            window.openHelpModal();
+          }
+        });
+      }
+    },
 
     enterGame() {
       if (this.overlay) {
