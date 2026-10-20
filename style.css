@@ -821,9 +821,9 @@ button:disabled {
 }
 
 .shrimp-list-item.selected-shrimp-card {
-    background: rgba(59, 157, 184, 0.12) !important;
-    border-color: var(--primary) !important;
-    box-shadow: 0 0 8px rgba(59, 157, 184, 0.25);
+    background: rgba(59, 157, 184, 0.15) !important;
+    border: 2px solid var(--primary) !important;
+    box-shadow: 0 0 8px rgba(59, 157, 184, 0.35);
 }
 
 .shrimp-list-item.tank-filter-highlighted {

@@ -2006,10 +2006,28 @@ window.buyPlantUpgrade = function (plantId, baseCost) {
 // ======================================================================
 
 window.inspectMedaka = function (fishId) {
+  console.log('[INSPECT] Selecting fish:', fishId);
+
   gameState.inspectedFishId = fishId;
-  playGameSpaceSound('choose'); // Play choose.mp3 on click
+
+  if (typeof window.playGameSound === 'function') {
+    window.playGameSound('choose');
+  }
+
   updateInspectedCard();
-  // Switch to specimen tab if not active
+
+  // Rebuild the list so the blue selection is updated.
+  if (window.renderSidebarFishList) {
+    window.renderSidebarFishList();
+  }
+
+  // The list has now been rebuilt, so wait one frame before scrolling it.
+  requestAnimationFrame(() => {
+    if (window.scrollFishListToFish) {
+      window.scrollFishListToFish(fishId);
+    }
+  });
+
   switchTab('tank');
 };
 
@@ -2439,7 +2457,7 @@ function openAutoFeederModal() {
   const maxCapacity = getTankFeederCapacity(currentTank) || 100;
   const currentInterval = getTankFeederInterval(currentTank);
   const timeLvl = currentTank.autoFeederTimeLevel || 1;
-  
+
   // FIX: Properly define currentLoaded here before using it in the subtitle template
   const currentLoaded = (currentTank.autoFeeder && currentTank.autoFeeder.queue) ? currentTank.autoFeeder.queue.length : 0;
 

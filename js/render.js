@@ -510,22 +510,47 @@
   };
 
   window.handleListFishClick = function (fishId) {
-    if (window.gameState && window.gameState.selectMode) {
-      window.toggleFishSelection(fishId);
-    } else {
-      if (window.inspectMedaka) {
-        window.inspectMedaka(fishId);
-      }
+    if (!window.gameState) {
+      return;
     }
+
+    if (window.gameState.selectMode) {
+
+      if (typeof window.toggleFishSelection === 'function') {
+        window.toggleFishSelection(fishId);
+      }
+      return;
+    }
+
+
+    window.gameState.inspectedFishId = fishId;
+
+    if (typeof window.playGameSound === 'function') {
+      window.playGameSound('choose');
+    }
+
+    if (typeof window.updateInspectedCard === 'function') {
+      window.updateInspectedCard();
+    }
+
+    requestAnimationFrame(() => {
+
+      if (typeof window.renderSidebarFishList === 'function') {
+        window.renderSidebarFishList();
+      }
+    });
   };
 
   function handleFishClick(fish) {
+    console.log('[AQUARIUM CLICK] Fish:', fish.id);
+
     if (window.gameState && window.gameState.selectMode) {
       window.toggleFishSelection(fish.id);
-    } else {
-      if (window.inspectMedaka) {
-        window.inspectMedaka(fish.id);
-      }
+      return;
+    }
+
+    if (window.inspectMedaka) {
+      window.inspectMedaka(fish.id);
     }
   }
 
@@ -555,8 +580,16 @@
 
     if (sortBtn) {
       sortBtn.addEventListener('click', () => {
-        listSortMode = listSortMode === 'value' ? 'name' : 'value';
-        sortBtn.textContent = listSortMode === 'value' ? 'Sort: Value' : 'Sort: Name';
+        if (listSortMode === 'value') {
+          listSortMode = 'gender';
+          sortBtn.textContent = 'Sort: Gender (♀ first)';
+        } else if (listSortMode === 'gender') {
+          listSortMode = 'name';
+          sortBtn.textContent = 'Sort: Name';
+        } else {
+          listSortMode = 'value';
+          sortBtn.textContent = 'Sort: Value';
+        }
         renderSidebarFishList();
       });
     }
@@ -565,6 +598,72 @@
       searchInput.addEventListener('input', () => renderSidebarFishList());
     }
   }
+
+  // Sync the blue inspection highlight without rebuilding the fish list.
+  window.syncSidebarFishHighlight = function () {
+    const body = document.getElementById('medakaListBody');
+    if (!body || !window.gameState) return;
+
+    const inspectedId = String(window.gameState.inspectedFishId || '');
+
+    body.querySelectorAll('.shrimp-list-item[data-fish-id]').forEach((card) => {
+      const fishId = String(card.dataset.fishId);
+      const isInspected = fishId === inspectedId;
+
+      card.classList.toggle('selected-shrimp-card', isInspected);
+    });
+  };
+
+  window.scrollFishListToFish = function (fishId) {
+    const body = document.getElementById('medakaListBody');
+
+    if (!body) {
+      console.error('[LIST SCROLL] medakaListBody not found');
+      return;
+    }
+
+    const id = String(fishId);
+
+    const cards = body.querySelectorAll('.shrimp-list-item');
+
+    console.log('[LIST SCROLL] Looking for fish:', id);
+    console.log('[LIST SCROLL] Cards in list:', cards.length);
+
+    let targetCard = null;
+
+    cards.forEach((card) => {
+      if (String(card.dataset.fishId) === id) {
+        targetCard = card;
+      }
+    });
+
+    if (!targetCard) {
+      console.error('[LIST SCROLL] Could not find card for fish:', id);
+      return;
+    }
+
+    console.log('[LIST SCROLL] Found card:', targetCard);
+    console.log('[LIST SCROLL] Current scrollTop:', body.scrollTop);
+    console.log('[LIST SCROLL] Card offsetTop:', targetCard.offsetTop);
+
+    // Put the selected fish roughly in the middle of the visible list.
+    const targetScroll =
+      targetCard.offsetTop -
+      (body.clientHeight / 2) +
+      (targetCard.offsetHeight / 2);
+
+    const maxScroll = body.scrollHeight - body.clientHeight;
+
+    body.scrollTo({
+      top: Math.max(0, Math.min(targetScroll, maxScroll)),
+      behavior: 'smooth'
+    });
+
+    console.log(
+      '[LIST SCROLL] Scrolling to:',
+      Math.max(0, Math.min(targetScroll, maxScroll))
+    );
+  };
 
   window.renderSidebarFishList = function () {
     const body = document.getElementById('medakaListBody');
@@ -591,24 +690,28 @@
     // Sort
     if (listSortMode === 'value') {
       list.sort((a, b) => (b.isAdult ? 15 : 5) - (a.isAdult ? 15 : 5));
+    } else if (listSortMode === 'gender') {
+      list.sort((a, b) => {
+        if (a.gender === 'F' && b.gender !== 'F') return -1;
+        if (a.gender !== 'F' && b.gender === 'F') return 1;
+        return a.name.localeCompare(b.name);
+      });
     } else {
       list.sort((a, b) => a.name.localeCompare(b.name));
     }
 
     body.innerHTML = list
       .map((fish) => {
-        const isInspected = window.gameState.inspectedFishId === fish.id;
+        const isInspected = window.gameState && window.gameState.inspectedFishId === fish.id;
         const isSelected = window.gameState.selectedFishIds && window.gameState.selectedFishIds.has(fish.id);
 
         let cardClass = '';
-        if (isSelected) {
-          cardClass = 'selected-shrimp-card select-mode-active';
-        } else if (isInspected) {
+        if (isSelected || isInspected) {
           cardClass = 'selected-shrimp-card';
         }
 
         return `
-          <div class="shrimp-list-item ${cardClass}" onclick="handleListFishClick('${fish.id}')">
+          <div class="shrimp-list-item ${cardClass}" data-fish-id="${fish.id}" onclick="handleListFishClick('${fish.id}')">
             <div class="shrimp-list-thumb">
               <canvas id="listThumb_${fish.id}" width="144" height="144"></canvas>
             </div>
@@ -626,6 +729,7 @@
         `;
       })
       .join('');
+
 
     // Draw sprite thumbnails into list canvases
     list.forEach((fish) => {
