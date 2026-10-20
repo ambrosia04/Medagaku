@@ -1690,7 +1690,6 @@ function openMoveModal(fishArray, titleText) {
   modal.classList.remove('hidden');
 }
 
-
 // Executes transfer when clicking "Transfer Here" in the pop-up
 window.confirmTransferFish = function (targetTankId) {
   const modal = document.getElementById('moveModal');
@@ -2008,7 +2007,7 @@ window.buyPlantUpgrade = function (plantId, baseCost) {
 
 window.inspectMedaka = function (fishId) {
   gameState.inspectedFishId = fishId;
-  playGameSound('choose'); // Play choose.mp3 on click
+  playGameSpaceSound('choose'); // Play choose.mp3 on click
   updateInspectedCard();
   // Switch to specimen tab if not active
   switchTab('tank');
@@ -2055,10 +2054,10 @@ function updateInspectedCard() {
   currentRenderedStage = fishStage;
 
   // Title & Subtitle: Fry show as Whitish Medaka Fry without expressing adult colors yet
-  const titleName = fish.isAdult ? fish.name : 'Whitish Medaka Fry';
+  const initialPercent = Math.min(100, Math.round(((fish.age || 0) / 50) * 100));
   const subtitle = fish.isAdult
     ? 'Adult Broodstock'
-    : `Growing Fry (Whitish Translucent • Maturing: ${Math.min(100, Math.round(((fish.age || 0) / 50) * 100))}%)`;
+    : `Growing Fry <span id="inspectSubtitleText">${initialPercent}</span>%)`;
 
   container.innerHTML = `
     <div class="selected-card">
@@ -2073,7 +2072,7 @@ function updateInspectedCard() {
             placeholder="Fish Name..." />
           <span style="font-size: 14px; font-weight: bold; flex-shrink: 0;">(${fish.gender === 'M' ? '♂' : '♀'})</span>
         </div>
-        <p class="small-text" style="margin-top: 0;">${subtitle}</p>
+        <p class="small-text" style="margin-top: 0;" id="inspectSubtitleContainer">${subtitle}</p>
         
         <!-- Satiety & Digestion Bar -->
         <div class="satiety-bar-wrapper">
@@ -2111,7 +2110,6 @@ function updateInspectedCard() {
       </div>
     </div>
 
-    <!-- Genetics Breakdown: Shows genotype genes, but notes unexpressed phenotype until adult -->
     <!-- Genetics Breakdown: Shows genotype genes, but notes unexpressed phenotype until adult -->
     <div class="detail-list" style="margin-top: 14px;">
       <div class="detail-item">
@@ -2188,6 +2186,13 @@ window.updateInspectedCardRealtime = function (targetFish) {
   const fish = targetFish || (tank ? tank.fish.find((f) => f.id === gameState.inspectedFishId) : null);
   if (!fish) return;
 
+  // 0. Update subtitle metadata live (e.g. Growing Fry maturing percentage)
+  const subtitleEl = document.getElementById('inspectSubtitleText');
+  if (subtitleEl && !fish.isAdult) {
+    const percent = Math.min(100, Math.round(((fish.age || 0) / 50) * 100));
+    subtitleEl.textContent = ` (Whitish Translucent • Maturing: ${percent}`;
+  }
+
   // 1. Stomach fullness & live digestion countdown
   const satietyFill = document.getElementById('inspectSatietyFill');
   const fullnessText = document.getElementById('inspectFullnessText');
@@ -2255,6 +2260,7 @@ window.updateInspectedCardRealtime = function (targetFish) {
     cycleContainer.classList.add('hidden');
   }
 };
+
 
 // ======================================================================
 // 6. ALLELE DISCOVERY & GENETICS CODEX
