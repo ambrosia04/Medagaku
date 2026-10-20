@@ -1108,7 +1108,13 @@ button:disabled {
     justify-content: center;
     z-index: 10005 !important;
     padding: 15px;
+    overscroll-behavior: contain; /* Prevents scroll chaining to background */
 }
+
+body.modal-open {
+    overflow: hidden !important;
+}
+
 
 .modal-box {
     background: white;
@@ -1755,10 +1761,23 @@ body.dark-theme .allele-card.locked {
 ========================================================= */
 
 #shrimpModal .modal-box {
-    height: 600px;
-    max-height: 90vh;
+    width: min(650px, 95vw);
+    height: 85vh; /* Fixed percentage of screen height */
+    max-height: 720px;
     display: flex;
     flex-direction: column;
+    overflow: hidden !important; /* Locks outer box so only 1 scrollbar exists */
+    padding: 20px 22px;
+    position: relative;
+}
+
+/* Modal Content wrapper fills the modal-box and sets up flex flow */
+#shrimpModal #modalContent {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
 }
 
 #shrimpModal h2 {
@@ -1769,9 +1788,6 @@ body.dark-theme .allele-card.locked {
 #shrimpModal p.small-text {
     margin: 0;
     flex-shrink: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 #shrimpModal .cull-bulk-actions {
@@ -1792,11 +1808,39 @@ body.dark-theme .allele-card.locked {
     font-size: 13.5px;
 }
 
+#shrimpModal .cull-destination-box {
+    flex-shrink: 0;
+    margin-bottom: 8px;
+}
+
+/* THE ONLY SCROLLABLE AREA: Full height with visible, scrollable track */
 #shrimpModal .cull-list {
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-    margin-top: 4px;
+    flex: 1 1 auto;
+    min-height: 180px;
+    height: 100%;
+    overflow-y: scroll !important;
+    overflow-x: hidden;
+    padding-right: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overscroll-behavior: contain; /* Traps wheel events inside the list */
+}
+
+/* High visibility custom scrollbar for cull-list */
+#shrimpModal .cull-list::-webkit-scrollbar {
+    width: 8px;
+}
+#shrimpModal .cull-list::-webkit-scrollbar-track {
+    background: #eef5f5;
+    border-radius: 4px;
+}
+#shrimpModal .cull-list::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 4px;
+}
+#shrimpModal .cull-list::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-dark);
 }
 
 /* =========================================================

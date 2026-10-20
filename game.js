@@ -913,6 +913,7 @@ function openCullingModal() {
   html += `</div>`;
   content.innerHTML = html;
   modal.classList.remove('hidden');
+  document.body.classList.add('modal-open');
 
   // Populate destination dropdown with live capacity
   updateNurseryDestinationDropdown();
@@ -1091,6 +1092,7 @@ function finishCurrentClutch() {
     openCullingModal();
   } else {
     document.getElementById('shrimpModal').classList.add('hidden');
+    document.body.classList.remove('modal-open'); // Unlocks page when all clutches are done
     updateHarvestButton();
     updateBottomEggCluster();
   }
@@ -1101,6 +1103,7 @@ function finishCurrentClutch() {
 
 function handleCloseNurseryModal() {
   document.getElementById('shrimpModal').classList.add('hidden');
+  document.body.classList.remove('modal-open'); 
 
   // If user closed the modal halfway, save remaining babies back to queue
   if (window.currentActiveClutch && window.activeCullBabies) {
