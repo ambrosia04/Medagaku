@@ -174,12 +174,8 @@
 
     if (mopLvl >= 15 && hornLvl >= 15 && spriteLvl >= 15) {
       if (Math.random() < 0.0001) {
-        // Pick ONE baby from this clutch.
-        const luckyBaby =
-          children[Math.floor(Math.random() * children.length)];
-
-        luckyBaby.genes.color[0] = 'fuchsia';
-        luckyBaby.genes.color[1] = 'fuchsia';
+        childGenes.color[0] = 'fuchsia';
+        childGenes.color[1] = 'fuchsia';
       }
     }
 

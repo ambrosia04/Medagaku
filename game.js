@@ -1002,7 +1002,7 @@ window.sellCullBaby = function (idx) {
     );
     if (!confirmed) return;
   }
-  const baseValue = (fish.color === 'gfp') ? 15 : 3;
+  const baseValue = (baby.color === 'gfp') ? 15 : 3;
   gameState.money += baseValue;
   window.activeCullBabies[idx] = null; // Mark as handled
 
