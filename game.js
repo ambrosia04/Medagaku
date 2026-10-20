@@ -3051,13 +3051,15 @@ window.showToast = function (title, desc) {
 };
 
 // AWARDS & ACHIEVEMENTS POPUP (Gold, Trophy Icon, Bottom of screen)
-function showAchievementPopup(title, desc) {
+function showAchievementPopup(title, desc, achievementId) {
   const el = document.getElementById('achievementPopup');
   if (!el) return;
 
+  const iconSrc = achievementId ? `achievements/${achievementId}.png` : 'emoji/trophy.png';
+
   el.classList.remove('hidden');
   el.innerHTML = `
-    <img src="emoji/trophy.png" class="ui-emoji" style="width:26px;height:26px;" alt="Award" />
+    <img src="${iconSrc}" class="ui-emoji" style="width:28px;height:28px;object-fit:contain;" alt="Award" onerror="this.src='emoji/trophy.png'" />
     <div>
       <strong style="display:block;color:#f1c40f;font-size:13.5px;">${title}</strong>
       <span style="font-size:12px;color:#cbd8dc;">${desc}</span>
@@ -3076,6 +3078,7 @@ function showAchievementPopup(title, desc) {
     }, 400);
   }, 3200);
 }
+window.showAchievementPopup = showAchievementPopup;
 
 function checkAchievements() {
   // Hook for window.checkAchievements in achievement.js

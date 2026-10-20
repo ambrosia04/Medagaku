@@ -85,7 +85,7 @@
       if (conditionMet && !alreadyUnlocked) {
         window.unlockedAchievements.add(ach.id);
         if (window.showAchievementPopup) {
-          window.showAchievementPopup('Achievement Unlocked!', ach.title);
+          window.showAchievementPopup('Achievement Unlocked!', ach.title, ach.id);
         }
       } else if (conditionMet && alreadyUnlocked) {
         // Ensure it stays marked without re-triggering the pop-up notification
