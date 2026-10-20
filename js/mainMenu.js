@@ -27,7 +27,11 @@
         <div class="menu-box">
           <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 12px;">
             <canvas id="menuFishLeft" width="72" height="72" style="transform: scaleX(-1);"></canvas>
-            <h1 class="menu-title" style="margin: 0; font-size: 28px; letter-spacing: -0.5px;">MedaGaku</h1>
+            <div class="logo" style="display: flex; align-items: center; justify-content: center;">
+              <img src="images/logo.png" alt="MedaGaku" style="max-height: 50px; width: auto;"
+                onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';" />
+              <h1 class="menu-title" style="display: none; margin: 0; font-size: 28px; letter-spacing: -0.5px;">MedaGaku</h1>
+            </div>
             <canvas id="menuFishRight" width="72" height="72"></canvas>
           </div>
           <p class="small-text" style="text-align: center; margin: 0 0 25px 0; color: #001116;">
@@ -63,6 +67,7 @@
       this.bindMenuEvents();
       this.renderMenuFish();
     },
+
 
     getSaveSnippet() {
       try {
