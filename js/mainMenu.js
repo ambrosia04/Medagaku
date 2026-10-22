@@ -55,7 +55,7 @@
 
           <div style="margin-top: 25px; text-align: center;">
             <span class="small-text" style="font-size: 11px; color: #001116;">
-              Version: 1.0.1a
+              Version: 1.0.2
             </span>
           </div>
         </div>

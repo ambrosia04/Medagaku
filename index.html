@@ -133,9 +133,23 @@
                 <img src="emoji/target.png" alt="Target" class="ui-emoji" /> Culling Targets
               </span>
               <div class="target-group-buttons">
-                <button id="openCullingTargetsModalBtn" class="secondary-button multi-select-btn" style="padding: 6px 12px; font-size: 12.5px;">
+                <button id="openCullingTargetsModalBtn" class="secondary-button multi-select-btn"
+                  style="padding: 6px 12px; font-size: 12.5px;">
                   <img src="emoji/dna.png" alt="DNA" class="ui-emoji" />
                   <span id="trackedAllelesBtnLabel">Configure Targets (0)</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- AUTOMATED NURSERY TOGGLE (Hidden until purchased for the active tank) -->
+            <div id="autoNurseryContainer" class="target-group-box hidden">
+              <span class="target-group-title">
+                <img src="emoji/baby.png" alt="Nursery" class="ui-emoji" /> Automated Nursery
+              </span>
+              <div class="target-group-buttons">
+                <button id="autoNurseryToggleBtn" class="secondary-button"
+                  style="padding: 6px 12px; font-size: 12px; font-weight: bold;" onclick="toggleAutoNursery()">
+                  Auto-Nursery: OFF
                 </button>
               </div>
             </div>
@@ -179,7 +193,8 @@
 
           <div class="aquarium-footer">
             <div class="aquarium-help" id="aquariumHelpText">
-              Click any medaka in the basin to inspect its genetics, or toggle Feed Mode to nourish your school and make them breed.
+              Click any medaka in the basin to inspect its genetics, or toggle Feed Mode to nourish your school and make
+              them breed.
             </div>
 
             <div class="aquarium-sell-controls">
@@ -213,22 +228,26 @@
 
       <!-- SIMULATION SPEED CONTROLS & ACTIVE DIET BADGE -->
       <div class="panel controls-panel">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 10px;">
+        <div
+          style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 10px;">
           <!-- Left: Title -->
           <h2 style="margin: 0; align-self: center;">Time & Diet Controls</h2>
-          
+
           <!-- Right: Food Dropdown on top, Auto-Feeder directly below it -->
           <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
             <!-- Food Dropdown Container -->
-            <div id="foodBadgeContainer" class="stat" style="font-size: 12px; padding: 4px 10px; display: flex; align-items: center; gap: 6px; margin: 0;">
+            <div id="foodBadgeContainer" class="stat"
+              style="font-size: 12px; padding: 4px 10px; display: flex; align-items: center; gap: 6px; margin: 0;">
               <img src="emoji/food.png" alt="Food" class="ui-emoji" />
               <span id="equippedFoodName">Standard Flake</span>
               <strong id="equippedFoodValue" style="color: var(--success); margin-left: 4px;">(+$1/bite)</strong>
             </div>
 
             <!-- Automatic Feeder Button directly below Food Dropdown -->
-            <button id="openAutoFeederBtn" class="secondary-button" style="font-size: 11.5px; padding: 4px 10px; font-weight: bold; display: flex; align-items: center; gap: 5px; cursor: pointer;">
-              <img src="emoji/food.png" alt="Auto" class="ui-emoji" style="width: 14px !important; height: 14px !important; margin: 0;" />
+            <button id="openAutoFeederBtn" class="secondary-button"
+              style="font-size: 11.5px; padding: 4px 10px; font-weight: bold; display: flex; align-items: center; gap: 5px; cursor: pointer;">
+              <img src="emoji/food.png" alt="Auto" class="ui-emoji"
+                style="width: 14px !important; height: 14px !important; margin: 0;" />
               <span id="autoFeederBtnLabel">Auto-Feeding (Locked)</span>
             </button>
           </div>
@@ -452,26 +471,30 @@
     </section>
 
     <!-- CULLING TARGETS CONFIGURATION MODAL -->
-  <div id="cullingTargetsModal" class="modal hidden">
-    <div class="modal-box" style="width: min(650px, 95vw); max-height: 85vh; display: flex; flex-direction: column;">
-      <button id="closeCullingTargetsModal" class="close-button">×</button>
-      <h2 style="margin: 0 0 4px 0;">
-        <img src="emoji/target.png" alt="Targets" class="ui-emoji" /> Configure Culling Targets
-      </h2>
-      <p class="small-text" style="margin-top: 0; margin-bottom: 12px;">
-        Select alleles to flag. Offspring carrying targeted traits will be highlighted green in the nursery and blocked from quick-selling.
-      </p>
-      
-      <div style="display: flex; gap: 10px; margin-bottom: 12px; flex-shrink: 0;">
-        <button type="button" id="modalSelectAllTargetsBtn" class="primary-button" style="flex: 1; padding: 7px; font-size: 12px;">Select All Discovered</button>
-        <button type="button" id="modalClearAllTargetsBtn" class="secondary-button" style="flex: 1; padding: 7px; font-size: 12px;">Clear All</button>
-      </div>
+    <div id="cullingTargetsModal" class="modal hidden">
+      <div class="modal-box" style="width: min(650px, 95vw); max-height: 85vh; display: flex; flex-direction: column;">
+        <button id="closeCullingTargetsModal" class="close-button">×</button>
+        <h2 style="margin: 0 0 4px 0;">
+          <img src="emoji/target.png" alt="Targets" class="ui-emoji" /> Configure Culling Targets
+        </h2>
+        <p class="small-text" style="margin-top: 0; margin-bottom: 12px;">
+          Select alleles to flag. Offspring carrying targeted traits will be highlighted green in the nursery and
+          blocked from quick-selling.
+        </p>
 
-      <div id="cullingTargetsCategoriesList" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 4px;">
-        <!-- Populated dynamically -->
+        <div style="display: flex; gap: 10px; margin-bottom: 12px; flex-shrink: 0;">
+          <button type="button" id="modalSelectAllTargetsBtn" class="primary-button"
+            style="flex: 1; padding: 7px; font-size: 12px;">Select All Discovered</button>
+          <button type="button" id="modalClearAllTargetsBtn" class="secondary-button"
+            style="flex: 1; padding: 7px; font-size: 12px;">Clear All</button>
+        </div>
+
+        <div id="cullingTargetsCategoriesList"
+          style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 4px;">
+          <!-- Populated dynamically -->
+        </div>
       </div>
     </div>
-  </div>
   </main>
 
   <!-- ================= MODALS & POPUPS ================= -->
@@ -532,7 +555,7 @@
     </div>
   </div>
 
-   <!-- 7. TOP ALARM NOTIFICATION (Top Blue without Image) -->
+  <!-- 7. TOP ALARM NOTIFICATION (Top Blue without Image) -->
   <div id="toastNotification" class="toast-notification hidden"></div>
 
   <!-- 8. AUTOMATIC FEEDER MODAL -->
@@ -561,12 +584,34 @@
         </div>
 
         <!-- RED ALERT NOTICE -->
-        <div id="autoFeederAlert" class="small-text hidden" style="color: var(--danger); font-weight: bold; margin-bottom: 10px; background: rgba(217,92,92,0.1); padding: 8px 10px; border-radius: 6px; border: 1px solid var(--danger);"></div>
+        <div id="autoFeederAlert" class="small-text hidden"
+          style="color: var(--danger); font-weight: bold; margin-bottom: 10px; background: rgba(217,92,92,0.1); padding: 8px 10px; border-radius: 6px; border: 1px solid var(--danger);">
+        </div>
 
         <div style="display: flex; gap: 10px; justify-content: flex-end;">
-          <button type="button" id="cancelAutoFeederBtn" class="secondary-button" style="min-width: 90px;">Cancel</button>
-          <button type="button" id="confirmAutoFeederBtn" class="primary-button" style="min-width: 100px;" disabled>Confirm</button>
+          <button type="button" id="cancelAutoFeederBtn" class="secondary-button"
+            style="min-width: 90px;">Cancel</button>
+          <button type="button" id="confirmAutoFeederBtn" class="primary-button" style="min-width: 100px;"
+            disabled>Confirm</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEW GAME CONFIRMATION MODAL -->
+  <div id="newGameModal" class="modal hidden">
+    <div class="modal-box" style="width: min(420px, 95vw); text-align: center; padding: 24px;">
+      <h2 style="margin: 0 0 10px 0;"><img src="emoji/warning.png" class="ui-emoji" alt="Warning" /> Start New Lineage?
+      </h2>
+      <p class="small-text" style="margin-bottom: 20px;">
+        Starting a fresh breeding line will permanently overwrite your current saved game progress. Are you sure you
+        want to proceed?
+      </p>
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button type="button" id="cancelNewGameModalBtn" class="secondary-button"
+          style="min-width: 100px;">Cancel</button>
+        <button type="button" id="confirmNewGameModalBtn" class="danger-button" style="min-width: 110px;">Yes,
+          Reset</button>
       </div>
     </div>
   </div>

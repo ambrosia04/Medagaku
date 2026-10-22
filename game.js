@@ -12,6 +12,7 @@ window.gameState = {
   minute: 0,
   second: 0,
   speed: 1,
+  autoNurseryEnabled: false,
   currentTankId: 'tank1',
   tanks: {
     tank1: {
@@ -127,7 +128,8 @@ const BACKGROUND_CATALOG = [
 const PLANT_CATALOG = [
   { id: 'spawningMop', name: 'Yarn Spawning Mop', cost: 100, desc: 'Provides safe fiber clusters. Increases clutch size by +20%.' },
   { id: 'hornwort', name: 'Matsumo (Hornwort)', cost: 185, desc: 'Oxygenating stems that speed up fry maturation by 15%.' },
-  { id: 'watersprite', name: 'Water Sprite', cost: 220, desc: 'Denser cover reducing female resting intervals by 20%.' }
+  { id: 'watersprite', name: 'Water Sprite', cost: 220, desc: 'Denser cover reducing female resting intervals by 20%.' },
+  { id: 'autoNursery', name: 'Automated Nursery Module', cost: 32000, desc: 'One-time basin installation. When enabled, automatically sorts clutches: keeps new traits & culling targets, and sells the rest.', isOneTime: true }
 ];
 
 let simulationInterval = null;
@@ -174,6 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateTrackedLabel();
   updateSpeedButtonsUI();
   updateAutoFeederButtonLabel();
+  updateAutoNurseryToggleUI();
 
   // If new game, start with initial pair
   const tank = getCurrentTank();
@@ -539,7 +542,7 @@ function queueEggClutch(mother, targetTank) {
   if (males.length === 0) return;
 
   const father = males[Math.floor(Math.random() * males.length)];
-  const clutchSize = Math.floor((3 + Math.random() * 4) * (1 + (currentTank.plants.spawningMop || 0) * 0.2));
+  const clutchSize = Math.floor((3 + Math.random() * 4) * (1 + ((currentTank.plants.spawningMop || 0) * 0.2)));
 
   const babies = [];
   for (let i = 0; i < clutchSize; i++) {
@@ -552,6 +555,60 @@ function queueEggClutch(mother, targetTank) {
     babies.push(offspring);
   }
 
+  const modal = document.getElementById('shrimpModal');
+  const isModalOpen = modal && !modal.classList.contains('hidden');
+  const isViewingThisTank = currentTank.id === (gameState.currentTankId || 'tank1');
+  const isAutoNurseryActive = Boolean(currentTank.plants && currentTank.plants.autoNursery && currentTank.autoNurseryEnabled);
+
+  // REAL-TIME INJECTION: If culling modal is already open for this tank!
+  if (isModalOpen && isViewingThisTank && window.activeCullBabies) {
+    const listContainer = document.getElementById('activeCullListContainer');
+    let addedCount = 0;
+    let autoSoldCount = 0;
+    let autoEarned = 0;
+
+    babies.forEach(baby => {
+      let shouldAdd = true;
+      if (isAutoNurseryActive) {
+        const evalResult = evaluateAutoNurseryEligibility(baby, window.batchSeenNewTraits || new Set());
+        shouldAdd = evalResult.keepForReview;
+      }
+
+      if (shouldAdd) {
+        const newIdx = window.activeCullBabies.length;
+        window.activeCullBabies.push(baby);
+        window.currentActiveClutch.babies.push(baby);
+
+        if (listContainer) {
+          listContainer.insertAdjacentHTML('beforeend', generateCullRowMarkup(baby, newIdx));
+          renderCullRowSprite(baby, newIdx);
+        }
+        addedCount++;
+      } else {
+        const val = (baby.color === 'gfp') ? 15 : 3;
+        gameState.money += val;
+        autoEarned += val;
+        autoSoldCount++;
+      }
+    });
+
+    if (autoSoldCount > 0) {
+      playGameSound('coin');
+      showToast('New Clutch Screened', `Mother dropped clutch: auto-sold ${autoSoldCount} duplicate/common fry (+$${autoEarned})`);
+    }
+
+    if (addedCount > 0) {
+      playGameSound('bubble');
+      showToast('New Target Fry Arrived!', `+${addedCount} new/target fry appended to your active harvest list.`);
+    }
+
+    checkCullProgress();
+    updateTopBar();
+    renderCensus();
+    return;
+  }
+
+  // Normal queuing when modal is not open
   window.pendingClutches.push({
     tankId: currentTank.id,
     motherName: mother.name,
@@ -561,6 +618,46 @@ function queueEggClutch(mother, targetTank) {
   updateHarvestButton();
   updateBottomEggCluster();
 }
+
+window.toggleAutoNursery = function () {
+  const tank = getCurrentTank();
+  if (!tank || !tank.plants || !tank.plants.autoNursery) return;
+
+  tank.autoNurseryEnabled = !tank.autoNurseryEnabled;
+  if (window.playGameSound) window.playGameSound('choose');
+  updateAutoNurseryToggleUI();
+  saveGame();
+};
+
+function updateAutoNurseryToggleUI() {
+  const container = document.getElementById('autoNurseryContainer');
+  const btn = document.getElementById('autoNurseryToggleBtn');
+  if (!container || !btn) return;
+
+  const tank = getCurrentTank();
+  const isInstalled = Boolean(tank && tank.plants && tank.plants.autoNursery);
+
+  if (isInstalled) {
+    container.classList.remove('hidden');
+    const isEnabled = Boolean(tank.autoNurseryEnabled);
+
+    btn.textContent = isEnabled ? 'Auto-Filter: ON' : 'Auto-Filter: OFF';
+
+    if (isEnabled) {
+      btn.style.background = 'var(--success)';
+      btn.style.color = '#ffffff';
+      btn.style.borderColor = 'var(--success)';
+    } else {
+      // Clear inline styles so the theme's .secondary-button styling works properly
+      btn.style.background = '';
+      btn.style.color = '';
+      btn.style.borderColor = '';
+    }
+  } else {
+    container.classList.add('hidden');
+  }
+}
+window.updateAutoNurseryToggleUI = updateAutoNurseryToggleUI;
 
 function updateHarvestButton() {
   const harvestBtn = document.getElementById('harvestEggsBtn');
@@ -811,28 +908,132 @@ window.toggleCullingTargetAllele = function (alleleId) {
   updateTrackedLabel();
 };
 
-function openCullingModal() {
-  const currentTank = getCurrentTank();
-  // Automatically default the destination tank to the basin you are currently viewing
-  window.nurseryDestinationTankId = currentTank.id;
-
-  if (!window.currentActiveClutch) {
-    if (!window.pendingClutches || window.pendingClutches.length === 0) return;
-    const idx = window.pendingClutches.findIndex(c => !c.tankId || c.tankId === currentTank.id);
-    if (idx === -1) return;
-    window.currentActiveClutch = window.pendingClutches.splice(idx, 1)[0];
-    window.activeCullBabies = window.currentActiveClutch.babies.slice();
+/**
+ * Evaluates whether a baby qualifies for review under the Automated Nursery:
+ * - Always keeps if it matches an active Culling Target.
+ * - For undiscovered traits, keeps the first occurrence seen in the current batch
+ *   and records it in batchSeenNewTraits so subsequent duplicates in the same batch get auto-sold.
+ */
+function evaluateAutoNurseryEligibility(baby, batchSeenNewTraits) {
+  const matchedTargets = getMatchedCullingTargets(baby);
+  if (matchedTargets.length > 0) {
+    return { keepForReview: true, isTarget: true, isNew: false };
   }
 
+  const undiscovered = getUndiscoveredTraits(baby);
+  // Find any undiscovered trait that hasn't already been picked in this batch
+  const novelTraits = undiscovered.filter(t => !batchSeenNewTraits.has(t.val));
+
+  if (novelTraits.length > 0) {
+    // Register these novel traits so subsequent babies with the same new trait are sold
+    novelTraits.forEach(t => batchSeenNewTraits.add(t.val));
+    return { keepForReview: true, isTarget: false, isNew: true };
+  }
+
+  return { keepForReview: false };
+}
+
+window.batchSeenNewTraits = new Set();
+
+function openCullingModal() {
+  const currentTank = getCurrentTank();
+  window.nurseryDestinationTankId = currentTank.id;
+
+  const currentTankId = currentTank.id;
+  const isAutoNurseryActive = Boolean(currentTank.plants && currentTank.plants.autoNursery && currentTank.autoNurseryEnabled);
+
+  // 1. Collect all waiting clutches for this tank
+  const matchingClutches = [];
+  if (window.currentActiveClutch && (!window.currentActiveClutch.tankId || window.currentActiveClutch.tankId === currentTankId)) {
+    matchingClutches.push(window.currentActiveClutch);
+    window.currentActiveClutch = null;
+  }
+
+  const remainingOtherTanks = [];
+  (window.pendingClutches || []).forEach(c => {
+    if (!c.tankId || c.tankId === currentTankId) {
+      matchingClutches.push(c);
+    } else {
+      remainingOtherTanks.push(c);
+    }
+  });
+  window.pendingClutches = remainingOtherTanks;
+
+  if (matchingClutches.length === 0) {
+    updateHarvestButton();
+    updateBottomEggCluster();
+    return;
+  }
+
+  // 2. Aggregate all babies across all clutches
+  const allBabies = [];
+  matchingClutches.forEach(c => {
+    if (Array.isArray(c.babies)) allBabies.push(...c.babies);
+  });
+
+  window.batchSeenNewTraits = new Set();
+  const babiesForReview = [];
+
+  if (isAutoNurseryActive) {
+    let autoSoldCount = 0;
+    let autoEarned = 0;
+
+    allBabies.forEach(baby => {
+      const evalResult = evaluateAutoNurseryEligibility(baby, window.batchSeenNewTraits);
+      if (evalResult.keepForReview) {
+        babiesForReview.push(baby);
+      } else {
+        const val = (baby.color === 'gfp') ? 15 : 3;
+        gameState.money += val;
+        autoEarned += val;
+        autoSoldCount++;
+      }
+    });
+
+    if (autoSoldCount > 0) {
+      playGameSound('coin');
+      showToast('Nursery Screened All Clutches', `Auto-sold ${autoSoldCount} duplicate / non-target fry (+$${autoEarned})`);
+      updateTopBar();
+      renderCensus();
+    }
+  } else {
+    // Auto-nursery is OFF: review all babies from all clutches together
+    babiesForReview.push(...allBabies);
+  }
+
+  // If every baby was auto-sold, no need to show an empty modal
+  if (babiesForReview.length === 0) {
+    document.getElementById('shrimpModal').classList.add('hidden');
+    document.body.classList.remove('modal-open');
+    window.activeCullBabies = [];
+    window.currentActiveClutch = null;
+    updateHarvestButton();
+    updateBottomEggCluster();
+    return;
+  }
+
+  // 3. Setup single combined review session
+  window.currentActiveClutch = {
+    tankId: currentTankId,
+    motherName: matchingClutches.length > 1 ? `Multiple (${matchingClutches.length} Clutches)` : matchingClutches[0].motherName,
+    babies: babiesForReview
+  };
+  window.activeCullBabies = babiesForReview.slice();
+
+  renderCullModalUI();
+}
+
+function renderCullModalUI() {
   const clutch = window.currentActiveClutch;
+  if (!clutch) return;
+
   const modal = document.getElementById('shrimpModal');
   const content = document.getElementById('modalContent');
-  const remainingCount = window.activeCullBabies.filter((b) => b !== null).length;
-  const discoveredSet = window.gameState.discoveredAlleles || new Set();
+  const remainingCount = window.activeCullBabies.filter(b => b !== null).length;
 
   let html = `
     <h2><img src="emoji/baby.png" class="ui-emoji" alt="Eggs" /> Egg Clutch Harvest</h2>
-    <p class="small-text">Offspring produced by mother: <strong>${clutch.motherName}</strong></p>
+    <p class="small-text">Combined harvest for <strong>${getCurrentTank().name}</strong> (${clutch.motherName})</p>
 
     <div class="cull-bulk-actions">
       <button class="primary-button" id="cullKeepAllBtn" title="Keyboard Shortcut: Left Arrow">
@@ -843,7 +1044,6 @@ function openCullingModal() {
       </button>
     </div>
 
-    <!-- NEW: Destination Basin Selector that remembers your chosen tank -->
     <div class="cull-destination-box">
       <label for="nurseryTankDestinationSelect" style="font-size: 12.5px; font-weight: bold; display: flex; align-items: center; gap: 5px;">
         <img src="emoji/herb.png" class="ui-emoji" alt="Destination" /> Destination Basin:
@@ -852,62 +1052,12 @@ function openCullingModal() {
       </select>
     </div>
 
-    <div class="cull-list">
+    <div class="cull-list" id="activeCullListContainer">
   `;
-
-  const formatTrait = (label, val) => {
-    const isNew = val && !discoveredSet.has(val);
-    if (isNew) {
-      return `<span class="undiscovered-trait">${label}: ${val} (NEW!)</span>`;
-    }
-    return `<span>${label}: ${val}</span>`;
-  };
 
   clutch.babies.forEach((baby, idx) => {
     if (window.activeCullBabies[idx] === null) return;
-
-    const newTraits = getUndiscoveredTraits(baby);
-    const hasNew = newTraits.length > 0;
-    const matchedTargets = getMatchedCullingTargets(baby);
-    const isTargeted = matchedTargets.length > 0;
-
-    const colorHtml = formatTrait('Color', baby.color);
-    const bodyHtml = formatTrait('Body', baby.bodyType === 'N' ? 'Normal' : baby.bodyType);
-    const finHtml = formatTrait('Fin', baby.fin);
-    const eyeHtml = formatTrait('Eyes', baby.eye);
-    const patternHtml = formatTrait('Pattern', baby.pattern);
-    const shineHtml = formatTrait('Shine', baby.iridophore);
-
-    // NEW: Stomach Capacity Indicator Text
-    const stomachHtml = `<span>Stomach Cap: <strong>${baby.maxFood}</strong></span>`;
-
-    // Row highlight style if targeted
-    const rowStyle = isTargeted ? 'border: 2px solid #2ecc71; background: rgba(46, 204, 113, 0.08);' : '';
-
-    html += `
-      <div class="cull-row" id="cullRow_${idx}" style="${rowStyle}">
-        <div class="cull-media">
-          <canvas id="cullCvs_${idx}" width="144" height="144"></canvas>
-        </div>
-        <div class="cull-info">
-          <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-            <strong>${baby.name} (${baby.gender === 'M' ? '♂' : '♀'})</strong>
-            ${hasNew ? '<span class="new-genetics-badge">★ NEW GENETICS</span>' : ''}
-            ${isTargeted ? '<span style="background:#2ecc71; color:#fff; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;">🎯 CULLING TARGET</span>' : ''}
-          </div>
-          <div class="small-text" style="margin-top: 3px; line-height: 1.4;">
-            ${colorHtml} | ${bodyHtml} | ${finHtml} | ${eyeHtml}
-          </div>
-          <div class="small-text" style="color: var(--primary); line-height: 1.4; display: flex; gap: 10px; flex-wrap: wrap;">
-            ${patternHtml} | ${shineHtml} | ${stomachHtml}
-          </div>
-        </div>
-        <div class="cull-buttons">
-          <button class="primary-button" onclick="keepCullBaby(${idx})">Keep</button>
-          <button class="danger-button" onclick="sellCullBaby(${idx})">Sell ($3)</button>
-        </div>
-      </div>
-    `;
+    html += generateCullRowMarkup(baby, idx);
   });
 
   html += `</div>`;
@@ -915,23 +1065,17 @@ function openCullingModal() {
   modal.classList.remove('hidden');
   document.body.classList.add('modal-open');
 
-  // Populate destination dropdown with live capacity
   updateNurseryDestinationDropdown();
 
-  // Render sprites into canvases
+  // Render sprites
   clutch.babies.forEach((baby, idx) => {
     if (window.activeCullBabies[idx] === null) return;
-    const cvs = document.getElementById(`cullCvs_${idx}`);
-    if (cvs && window.medakaRendererInstance) {
-      window.medakaRendererInstance.buildFishSprite(baby).then((sprite) => {
-        const ctx = cvs.getContext('2d');
-        ctx.drawImage(sprite, 0, 0, 144, 144);
-      });
-    }
+    renderCullRowSprite(baby, idx);
   });
 
+  // Bulk button listeners
   document.getElementById('cullKeepAllBtn').onclick = () => {
-    const unhandled = window.activeCullBabies.filter((b) => b !== null);
+    const unhandled = window.activeCullBabies.filter(b => b !== null);
     const targetTank = gameState.tanks[window.nurseryDestinationTankId] || getCurrentTank();
 
     if (targetTank.fish.length + unhandled.length > targetTank.capacity) {
@@ -939,34 +1083,19 @@ function openCullingModal() {
       return;
     }
 
-    unhandled.forEach((baby) => keepBaby(baby));
+    unhandled.forEach(baby => keepBaby(baby));
     window.activeCullBabies = [];
     finishCurrentClutch();
   };
 
   document.getElementById('cullSellAllBtn').onclick = () => {
-    const unhandled = window.activeCullBabies.filter((b) => b !== null);
+    const unhandled = window.activeCullBabies.filter(b => b !== null);
     if (unhandled.length === 0) return;
 
     const protectedBabies = unhandled.filter(b => getMatchedCullingTargets(b).length > 0);
     if (protectedBabies.length > 0) {
-      const confirmedBulkTarget = confirm(
-        `⚠️ WARNING: Culling Targets in Batch!\n\n${protectedBabies.length} baby medaka in this clutch match your active Culling Targets.\n\nAre you sure you want to Sell All and discard these target traits?`
-      );
-      if (!confirmedBulkTarget) return;
-    }
-
-    const babiesWithNew = unhandled.filter((b) => getUndiscoveredTraits(b).length > 0);
-    if (babiesWithNew.length > 0) {
-      const listSummary = babiesWithNew
-        .map((b) => {
-          const traits = getUndiscoveredTraits(b).map((t) => `${t.label}: ${t.val}`).join(', ');
-          return `• ${b.name}: ${traits}`;
-        })
-        .join('\n');
-
       const confirmed = confirm(
-        `⚠️ WARNING: Undiscovered Genetics in this Clutch!\n\n${babiesWithNew.length} medaka in this clutch carry traits you have NOT discovered yet:\n\n${listSummary}\n\nAre you sure you want to Sell All and discard these new genetics?`
+        `⚠️ WARNING: Culling Targets in Batch!\n\n${protectedBabies.length} baby medaka match your active Culling Targets.\n\nSell All and discard these target traits?`
       );
       if (!confirmed) return;
     }
@@ -981,6 +1110,54 @@ function openCullingModal() {
   updateBottomEggCluster();
 }
 
+function generateCullRowMarkup(baby, idx) {
+  const discoveredSet = window.gameState.discoveredAlleles || new Set();
+  const formatTrait = (label, val) => {
+    const isNew = val && !discoveredSet.has(val);
+    return isNew ? `<span class="undiscovered-trait">${label}: ${val} (NEW!)</span>` : `<span>${label}: ${val}</span>`;
+  };
+
+  const newTraits = getUndiscoveredTraits(baby);
+  const matchedTargets = getMatchedCullingTargets(baby);
+  const isTargeted = matchedTargets.length > 0;
+  const rowStyle = isTargeted ? 'border: 2px solid #2ecc71; background: rgba(46, 204, 113, 0.08);' : '';
+
+  return `
+    <div class="cull-row" id="cullRow_${idx}" style="${rowStyle}">
+      <div class="cull-media">
+        <canvas id="cullCvs_${idx}" width="144" height="144"></canvas>
+      </div>
+      <div class="cull-info">
+        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+          <strong>${baby.name} (${baby.gender === 'M' ? '♂' : '♀'})</strong>
+          ${newTraits.length > 0 ? '<span class="new-genetics-badge">★ NEW GENETICS</span>' : ''}
+          ${isTargeted ? '<span style="background:#2ecc71; color:#fff; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;">🎯 CULLING TARGET</span>' : ''}
+        </div>
+        <div class="small-text" style="margin-top: 3px; line-height: 1.4;">
+          ${formatTrait('Color', baby.color)} | ${formatTrait('Body', baby.bodyType === 'N' ? 'Normal' : baby.bodyType)} | ${formatTrait('Fin', baby.fin)} | ${formatTrait('Eyes', baby.eye)}
+        </div>
+        <div class="small-text" style="color: var(--primary); line-height: 1.4; display: flex; gap: 10px; flex-wrap: wrap;">
+          ${formatTrait('Pattern', baby.pattern)} | ${formatTrait('Shine', baby.iridophore)} | <span>Stomach Cap: <strong>${baby.maxFood}</strong></span>
+        </div>
+      </div>
+      <div class="cull-buttons">
+        <button class="primary-button" onclick="keepCullBaby(${idx})">Keep</button>
+        <button class="danger-button" onclick="sellCullBaby(${idx})">Sell ($3)</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderCullRowSprite(baby, idx) {
+  const cvs = document.getElementById(`cullCvs_${idx}`);
+  if (cvs && window.medakaRendererInstance) {
+    window.medakaRendererInstance.buildFishSprite(baby).then(sprite => {
+      const ctx = cvs.getContext('2d');
+      ctx.clearRect(0, 0, 144, 144);
+      ctx.drawImage(sprite, 0, 0, 144, 144);
+    });
+  }
+}
 
 // Individual Sell with warning if undiscovered
 window.sellCullBaby = function (idx) {
@@ -1103,7 +1280,7 @@ function finishCurrentClutch() {
 
 function handleCloseNurseryModal() {
   document.getElementById('shrimpModal').classList.add('hidden');
-  document.body.classList.remove('modal-open'); 
+  document.body.classList.remove('modal-open');
 
   // If user closed the modal halfway, save remaining babies back to queue
   if (window.currentActiveClutch && window.activeCullBabies) {
@@ -1516,7 +1693,8 @@ window.buyNewBasin = function (tankId, tankName, cost, capacity = 25) {
       capacity: capacity,
       background: 'blue',
       fish: [],
-      plants: { hornwort: 0, watersprite: 0, spawningMop: 0 }
+      plants: { hornwort: 0, watersprite: 0, spawningMop: 0, autoNursery: false },
+      autoNurseryEnabled: false
     };
   } else {
     gameState.tanks[tankId].name = tankName;
@@ -1593,6 +1771,7 @@ function switchTank(targetTankId) {
   updateBackgroundDropdown();
   updateTankDropdown();
   updateAutoFeederButtonLabel();
+  updateAutoNurseryToggleUI();
 
   updateTopBar();
   renderCensus();
@@ -1965,10 +2144,32 @@ function renderPlantShop() {
 
   const tank = getCurrentTank();
   container.innerHTML = PLANT_CATALOG.map((plant) => {
+    // 1. One-time purchase check for Auto-Nursery
+    if (plant.isOneTime) {
+      const isOwned = Boolean(tank.plants[plant.id]);
+      const canAfford = gameState.money >= plant.cost;
+
+      return `
+        <div class="shop-card" style="${isOwned ? 'border-color: var(--success);' : ''}">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="margin:0;">${plant.name}</h3>
+            <span class="small-text" style="font-weight:bold; color:var(--primary);">${tank.name}</span>
+          </div>
+          <p class="small-text">${plant.desc}</p>
+          <div class="shop-price">${isOwned ? 'INSTALLED' : '$' + plant.cost}</div>
+          <button class="primary-button shop-button" 
+            ${isOwned || !canAfford ? 'disabled' : ''} 
+            onclick="buyOneTimePlantUpgrade('${plant.id}', ${plant.cost})">
+            ${isOwned ? 'Installed in this Basin' : `Install (${tank.name})`}
+          </button>
+        </div>
+      `;
+    }
+
+    // 2. Standard leveled plants (Lvl 1 - 20)
     const currentLevel = tank.plants[plant.id] || 0;
     const isMax = currentLevel >= 20;
 
-    // Log-scale price calculation: baseCost * (1.35 ^ currentLevel)
     const baseCost = plant.cost;
     const nextCost = isMax ? 0 : Math.round(baseCost * Math.pow(1.35, currentLevel));
     const canAfford = gameState.money >= nextCost;
@@ -1987,6 +2188,23 @@ function renderPlantShop() {
     `;
   }).join('');
 }
+
+window.buyOneTimePlantUpgrade = function (plantId, cost) {
+  const tank = getCurrentTank();
+  if (tank.plants[plantId] || gameState.money < cost) return;
+
+  gameState.money -= cost;
+  tank.plants[plantId] = true;
+  tank.autoNurseryEnabled = true; // Auto-enable upon installation
+
+  playGameSound('coin');
+  showToast('Nursery Installed', `Automated Nursery installed in ${tank.name}!`);
+
+  renderPlantShop();
+  updateAutoNurseryToggleUI();
+  updateTopBar();
+  saveGame();
+};
 
 window.buyPlantUpgrade = function (plantId, baseCost) {
   const tank = getCurrentTank();
@@ -3150,6 +3368,17 @@ function loadGame() {
     if (raw) {
       const data = JSON.parse(raw);
       Object.assign(gameState, data);
+
+      if (gameState.tanks) {
+        for (const tid in gameState.tanks) {
+          const t = gameState.tanks[tid];
+          if (t) {
+            if (!t.plants) t.plants = {};
+            if (t.plants.autoNursery === undefined) t.plants.autoNursery = false;
+            if (t.autoNurseryEnabled === undefined) t.autoNurseryEnabled = false;
+          }
+        }
+      }
 
       // ALWAYS start with empty selection on load or reload
       gameState.selectedFishIds = new Set();

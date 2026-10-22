@@ -2065,3 +2065,7 @@ body.dark-theme .speed-button.locked {
         opacity: 0;
     }
 }
+
+#autoNurseryToggleBtn {
+  transition: background 0.2s ease, color 0.2s ease;
+}
